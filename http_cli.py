@@ -1,12 +1,18 @@
 # http_cli.py
 
 import socket
+import sys
+import http.client
+
+# get user input for hostname
+host = sys.argv[1]
+# message for server
+#message = sys.argv[2]
+print("host: " + host)
+#print(message)
 
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# get server name
-host = socket.gethostname()
 
 # get prot number
 # port hardcoded
@@ -16,8 +22,10 @@ port = 80
 # on a specified port
 sock.connect((host, port))
 
-# Protocol exchange - sends and receives
-sock.send("GET /3/howto/sockets.html HTTP/1.0\n\n")
+# prepare message for server
+message = 'GET /3/howto/sockets.html HTTP/1.1' + "\n\n"
+print ("Here is your message: " + message)
+sock.send(message.encode('ascii'))
 while True:
         response = sock.recv(1024)
         if response == "": break
