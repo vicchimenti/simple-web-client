@@ -3,19 +3,26 @@
 import socket
 
 # Set up a TCP/IP socket
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# get server name
+host = socket.gethostname()
+
+# get prot number
+# port hardcoded
+port = 80
 
 # Connect as client to a selected server
 # on a specified port
-s.connect(("docs.python.org",80))
+sock.connect((host, port))
 
 # Protocol exchange - sends and receives
-s.send("GET /3/howto/sockets.html HTTP/1.0\n\n")
+sock.send("GET /3/howto/sockets.html HTTP/1.0\n\n")
 while True:
-        resp = s.recv(1024)
-        if resp == "": break
-        print resp,
+        response = sock.recv(1024)
+        if response == "": break
+        print (response.decode('ascii')),
 
 # Close the connection
-s.close()
-print "\nSuccess! Connection Closed"
+sock.close()
+print ("Success! Connection Closed")
