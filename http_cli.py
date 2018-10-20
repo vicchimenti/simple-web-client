@@ -7,7 +7,7 @@ import http.client
 # get user input for hostname
 host = sys.argv[1]
 # message for server
-#message = sys.argv[2]
+#message = sys.argv[2]  will need to collect file info and port num from cmdline
 print("host: " + host)
 #print(message)
 
