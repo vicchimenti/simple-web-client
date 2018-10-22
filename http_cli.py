@@ -2,7 +2,7 @@
 
 import socket
 import sys
-import http.client
+
 
 # get user input for hostname
 host = sys.argv[1]
