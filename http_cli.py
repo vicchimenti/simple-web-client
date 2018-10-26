@@ -10,12 +10,15 @@ print("user_input: " + user_input)
 
 #parse user_input to expose full URL
 li = list(user_input.split("//"))
-print("new list: " + li)
+full_URL = li[1]
+print("full URL: " + full_URL)
 
 #parse domain from path
-li2 = (li[1].split("/"))
-print("Domain: " + li2[0])
-print("Path: " + li2[1])
+li = (full_URL.split("/"))
+domain = li[0]
+path = li[1]
+print("Domain: " + domain)
+print("Path: " + path)
 # message for server
 #message = sys.argv[2]  will need to collect file info and port num from cmdline
 
