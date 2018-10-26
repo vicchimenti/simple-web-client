@@ -4,6 +4,9 @@ import socket
 import sys
 
 
+# default port number to 80
+port = 80
+
 # get user input from command line
 user_input = sys.argv[1]
 print("user_input: " + user_input)
@@ -15,9 +18,9 @@ print("full URL: " + full_URL)
 
 #parse domain from path
 li = (full_URL.split("/"))
-domain = li[0]
+host = li[0]
 path = li[1]
-print("Domain: " + domain)
+print("host: " + host)
 print("Path: " + path)
 # message for server
 #message = sys.argv[2]  will need to collect file info and port num from cmdline
@@ -27,16 +30,13 @@ print("Path: " + path)
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# get prot number
-# port hardcoded
-port = 80
 
 # Connect as client to a selected server
 # on a specified port
 sock.connect((host, port))
 
 # prepare message for server
-message = 'GET /3/howto/sockets.html HTTP/1.1' + "\n\n"
+message = 'GET ' + path + "\n\n"
 print ("Here is your message: " + message)
 sock.send(message.encode('ascii'))
 while True:
