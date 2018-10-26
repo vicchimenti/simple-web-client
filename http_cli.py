@@ -12,9 +12,10 @@ user_input = sys.argv[1]
 print("user_input: " + user_input)
 
 #parse user_input to expose full URL
-element = find("//", beg = 0, end = len(user_input))
-print("element: " + element)
-if element == -1 :
+delim = "//"
+x = delim.find(user_input, 0, len(user_input))
+print("x: " + str(x))
+if x == -1 :
     full_URL = user_input
 else :
     li = list(user_input.split("//" , 2))
@@ -23,12 +24,11 @@ print("full URL: " + full_URL)
 
 
 #parse domain from path
-li = (full_URL.split("/"))
-it = iter(li)
+delim = "/"
+x = delim.find(full_URL)
+li = (full_URL.split(full_URL[x]))
 host = li[0]
-next(it)
-for x in it:
-    path += li[i]
+path = li[1]
 print("host: " + host)
 print("Path: " + path)
 # message for server
