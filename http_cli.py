@@ -13,13 +13,19 @@ print("user_input: " + user_input)
 
 #parse user_input to expose full URL
 li = list(user_input.split("//"))
-full_URL = li[1]
+index = len(li)
+if (index < 1)
+    full_URL = li[0]
+else
+    full_URL = li[1]
 print("full URL: " + full_URL)
 
 #parse domain from path
 li = (full_URL.split("/"))
+index = len(li)
 host = li[0]
-path = li[1]
+for (int i = 1 i < index i++)
+    path += li[i]
 print("host: " + host)
 print("Path: " + path)
 # message for server
