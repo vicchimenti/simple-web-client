@@ -12,19 +12,22 @@ user_input = sys.argv[1]
 print("user_input: " + user_input)
 
 #parse user_input to expose full URL
-li = list(user_input.split("//"))
-index = len(li)
-if (index < 1)
-    full_URL = li[0]
-else
+element = find("//", beg = 0, end = len(user_input))
+print("element: " + element)
+if element == -1 :
+    full_URL = user_input
+else :
+    li = list(user_input.split("//" , 2))
     full_URL = li[1]
 print("full URL: " + full_URL)
 
+
 #parse domain from path
 li = (full_URL.split("/"))
-index = len(li)
+it = iter(li)
 host = li[0]
-for (int i = 1 i < index i++)
+next(it)
+for x in it:
     path += li[i]
 print("host: " + host)
 print("Path: " + path)
@@ -42,7 +45,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((host, port))
 
 # prepare message for server
-message = 'GET ' + path + "\n\n"
+message = "GET "  + path + "\n\n"
 print ("Here is your message: " + message)
 sock.send(message.encode('ascii'))
 while True:
