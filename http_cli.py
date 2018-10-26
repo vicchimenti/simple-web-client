@@ -1,5 +1,3 @@
-# http_cli.py
-
 import socket
 import sys
 
@@ -13,7 +11,7 @@ print("user_input: " + user_input)
 
 #parse user_input to expose full URL
 delim = "//"
-x = delim.find(user_input, 0, len(user_input))
+x = user_input.find(delim)
 print("x: " + str(x))
 if x == -1 :
     full_URL = user_input
@@ -25,12 +23,13 @@ print("full URL: " + full_URL)
 
 #parse domain from path
 delim = "/"
-x = delim.find(full_URL)
-li = (full_URL.split(full_URL[x]))
-host = li[0]
-path = li[1]
+x = full_URL.find(delim)
+#li = (full_URL.split(full_URL[x]))
+host = full_URL[:x]
+path = full_URL[x:]
 print("host: " + host)
 print("Path: " + path)
+
 # message for server
 #message = sys.argv[2]  will need to collect file info and port num from cmdline
 
@@ -38,7 +37,7 @@ print("Path: " + path)
 
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+sys.exit()
 
 # Connect as client to a selected server
 # on a specified port
