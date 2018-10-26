@@ -4,11 +4,21 @@ import socket
 import sys
 
 
-# get user input for hostname
-host = sys.argv[1]
+# get user input from command line
+user_input = sys.argv[1]
+print("user_input: " + user_input)
+
+#parse user_input to expose full URL
+li = list(user_input.split("//"))
+print("new list: " + li)
+
+#parse domain from path
+li2 = (li[1].split("/"))
+print("Domain: " + li2[0])
+print("Path: " + li2[1])
 # message for server
 #message = sys.argv[2]  will need to collect file info and port num from cmdline
-print("host: " + host)
+
 #print(message)
 
 # Set up a TCP/IP socket
