@@ -1,30 +1,63 @@
-# http_cli.py
-
 import socket
 import sys
-import http.client
 
-# get user input for hostname
-host = sys.argv[1]
-# message for server
-#message = sys.argv[2]  will need to collect file info and port num from cmdline
-print("host: " + host)
-#print(message)
+
+# default port number to 80
+port = 80
+
+# get user input from command line
+user_input = sys.argv[1]
+print("user_input: " + user_input)
+
+# parse user_input to expose full URL
+delim = "//"
+x = user_input.find(delim)
+print("x //: " + str(x))
+if x == -1 :
+    full_URL = user_input
+    print("full URL if: " + full_URL)
+else :
+    protocol, full_URL = (user_input.split(delim , 2))
+    print("full URL else: " + full_URL)
+
+
+# search for user provided port number
+delim = ":"
+x = full_URL.find(delim)
+print("x :: " + str(x))
+if x != -1 :
+    host, portPathway = (full_URL.split(delim, 2))
+    print("host if: " + host)
+    print("portPath if: " + portPathway)
+    delim = "/"
+    x = portPathway.find(delim)
+    portstr = portPathway[:x]
+    path = portPathway[x:]
+    print("host if: " + host)
+    print("Path if: " + path)
+    print("portstr if: " + portstr)
+    port = int(portstr)
+else :
+    # parse domain from path
+    delim = "/"
+    x = full_URL.find(delim)
+    host = full_URL[:x]
+    path = full_URL[x:]
+    print("host else: " + host)
+    print("Path else: " + path)
+
+
 
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# get prot number
-# port hardcoded
-port = 80
-
 # Connect as client to a selected server
-# on a specified port
 sock.connect((host, port))
 
 # prepare message for server
-message = 'GET /3/howto/sockets.html HTTP/1.1' + "\n\n"
+message = "GET "  + path + "HTTP/1.1\n\n"
 print ("Here is your message: " + message)
+sys.exit()
 sock.send(message.encode('ascii'))
 while True:
         response = sock.recv(1024)
