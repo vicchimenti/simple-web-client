@@ -15,47 +15,40 @@ x = user_input.find(delim)
 print("x //: " + str(x))
 if x == -1 :
     full_URL = user_input
+    print("full URL if: " + full_URL)
 else :
-    li = list(user_input.split(delim , 2))
-    full_URL = li[1]
-print("full URL: " + full_URL)
+    >>> protocol, full_URL = (user_input.split(delim , 2))
+    print("full URL else: " + full_URL)
+
 
 # search for user provided port number
 delim = ":"
 x = full_URL.find(delim)
 print("x :: " + str(x))
 if x != -1 :
-    li = list(full_URL.split(delim, 2))
-    host = li[0]
-    portPathway = li[1]
-    print("host: " + host)
-    print("portPath: " + portPathway)
+    >>> host, portPathway = (full_URL.split(delim, 2))
+    print("host if: " + host)
+    print("portPath if: " + portPathway)
     delim = "/"
     port = portPathway[:delim]
     path = portPathway[delim:]
+    print("host if: " + host)
+    print("Path if: " + path)
 else
     # parse domain from path
     delim = "/"
     x = full_URL.find(delim)
     host = full_URL[:x]
     path = full_URL[x:]
+    print("host else: " + host)
+    print("Path else: " + path)
 
 
-
-print("host: " + host)
-print("Path: " + path)
-
-# message for server
-#message = sys.argv[2]  will need to collect file info and port num from cmdline
-
-#print(message)
 
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sys.exit()
 
 # Connect as client to a selected server
-# on a specified port
 sock.connect((host, port))
 
 # prepare message for server
@@ -70,3 +63,4 @@ while True:
 # Close the connection
 sock.close()
 print ("Success! Connection Closed")
+sys.exit()
