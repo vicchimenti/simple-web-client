@@ -3,7 +3,8 @@
 # http_cli.py
 # Created           10/19/2018
 # Last Modified     10/27/2018
-# Simple Web Client in Python
+# Simple Web Client in Python3
+# usr/bin/python3
 
 
 
@@ -16,7 +17,7 @@ port = 80
 
 # get user input from command line
 user_input = sys.argv[1]
-print("user_input: " + user_input)
+#print("user_input: " + user_input)
 
 
 
@@ -24,17 +25,15 @@ print("user_input: " + user_input)
 # parse user_input to expose full URL
 delim = "//"
 x = user_input.find(delim)
-print("x //: " + str(x))
+#print("x //: " + str(x))
 
 # if no http:// protocol was entered by the user
-if x == -1 :
-    full_URL = user_input
-    print("full URL if: " + full_URL)
+if x == -1 : full_URL = user_input
+    #print("full URL if: " + full_URL)
 
 # if an http:// protocol was entered with the URL
-else :
-    protocol, full_URL = (user_input.split(delim , 2))
-    print("full URL else: " + full_URL)
+else : protocol, full_URL = (user_input.split(delim , 2))
+    #print("full URL else: " + full_URL)
 
 
 
@@ -42,22 +41,22 @@ else :
 # search for user provided port number
 delim = ":"
 x = full_URL.find(delim)
-print("x :: " + str(x))
+#print("x :: " + str(x))
 
 # if there is no colon in the user input
 if x != -1 :
     # parse the host domain from the full URL
     host, portPathway = (full_URL.split(delim, 2))
-    print("host if: " + host)
-    print("portPath if: " + portPathway)
+    #print("host if: " + host)
+    #print("portPath if: " + portPathway)
     #parse domain from path
     delim = "/"
     x = portPathway.find(delim)
     portstr = portPathway[:x]
     path = portPathway[x:]
-    print("host if: " + host)
-    print("Path if: " + path)
-    print("portstr if: " + portstr)
+    #print("host if: " + host)
+    #print("Path if: " + path)
+    #print("portstr if: " + portstr)
     #convert the port number into an integer
     port = int(portstr)
 
@@ -68,8 +67,8 @@ else :
     x = full_URL.find(delim)
     host = full_URL[:x]
     path = full_URL[x:]
-    print("host else: " + host)
-    print("Path else: " + path)
+    #print("host else: " + host)
+    #print("Path else: " + path)
 
 
 
@@ -84,21 +83,21 @@ sock.connect((host, port))
 
 # prepare message for server
 message = "GET "  + path + " HTTP/1.1\r\nConnection: close\r\nHost: " + host + "\r\n\r\n"
-print ("Here is your message: \n" + message)
+print ("Here is your GET Request: \n" + message)
 
 #TODO Print GET Message to stderr / cerr
 
 
 # send message to the web server
-sock.sendall(message.encode('utf-8'))
+sock.sendall(message.encode('utf8'))
 
 
 # wait for entire response
 while True :
     response = sock.recv(65536)
     if  not response : break
-    print (response.decode('utf-8'))
-
+    print (response.decode('utf8'))
+#'utf-16'
 
 # Close the connection
 sock.close()
