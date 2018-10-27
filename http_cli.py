@@ -57,13 +57,16 @@ sock.connect((host, port))
 # prepare message for server
 message = "GET "  + path + " HTTP/1.1\r\nConnection: close\r\nHost: " + host + "\r\n\r\n"
 print ("Here is your message: \n" + message)
-sock.send(message.encode('ascii'))
-#while True:
-response = sock.recv(1024)
-#if response == "": break
-#print ("recving")
-#print (response.decode('ascii'))
-#sys.exit()
+sock.send(message.encode('utf-8'))
+#sock.sendall(message.encode())
+#response = sock.recv(4096)
+#print (response.decode('utf-8'))
+while True :
+    response = sock.recv(40430)
+    if  not response : break
+    #if  response == " ": break
+    print (response.decode('utf-8'))
+    #sys.exit()
 
 # Close the connection
 sock.close()
