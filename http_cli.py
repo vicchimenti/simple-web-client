@@ -17,7 +17,7 @@ if x == -1 :
     full_URL = user_input
     print("full URL if: " + full_URL)
 else :
-    >>> protocol, full_URL = (user_input.split(delim , 2))
+    protocol, full_URL = (user_input.split(delim , 2))
     print("full URL else: " + full_URL)
 
 
@@ -26,15 +26,18 @@ delim = ":"
 x = full_URL.find(delim)
 print("x :: " + str(x))
 if x != -1 :
-    >>> host, portPathway = (full_URL.split(delim, 2))
+    host, portPathway = (full_URL.split(delim, 2))
     print("host if: " + host)
     print("portPath if: " + portPathway)
     delim = "/"
-    port = portPathway[:delim]
-    path = portPathway[delim:]
+    x = portPathway.find(delim)
+    portstr = portPathway[:x]
+    path = portPathway[x:]
     print("host if: " + host)
     print("Path if: " + path)
-else
+    print("portstr if: " + portstr)
+    port = int(portstr)
+else :
     # parse domain from path
     delim = "/"
     x = full_URL.find(delim)
@@ -52,8 +55,9 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((host, port))
 
 # prepare message for server
-message = "GET "  + path + "\n\n"
+message = "GET "  + path + "HTTP/1.1\n\n"
 print ("Here is your message: " + message)
+sys.exit()
 sock.send(message.encode('ascii'))
 while True:
         response = sock.recv(1024)
@@ -63,4 +67,3 @@ while True:
 # Close the connection
 sock.close()
 print ("Success! Connection Closed")
-sys.exit()
