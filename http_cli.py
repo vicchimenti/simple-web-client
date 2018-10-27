@@ -62,7 +62,7 @@ sock.send(message.encode('utf-8'))
 #response = sock.recv(4096)
 #print (response.decode('utf-8'))
 while True :
-    response = sock.recv(40430)
+    response = sock.recv(65536)
     if  not response : break
     #if  response == " ": break
     print (response.decode('utf-8'))
