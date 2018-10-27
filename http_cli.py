@@ -81,11 +81,19 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((host, port))
 
 
-# prepare message for server
-message = "GET "  + path + " HTTP/1.1\r\nConnection: close\r\nHost: " + host + "\r\n\r\n"
-print ("Here is your GET Request: \n" + message)
+# prepare message for server and display
+try :
+    message = "GET "  + path \
+                      + " HTTP/1.1\r\nConnection: close\r\nHost: " \
+                      + host \
+                      + "\r\n\r\n"
+except :
+    tb = sys.exc_info()
+    print ("EXCEPTION: \n" + tb)
+else :
+    print (message)
 
-#TODO Print GET Message to stderr / cerr
+# !!!!!!!    TODO Print GET Message to stderr / cerr !!!!!
 
 
 # send message to the web server
@@ -96,7 +104,9 @@ sock.sendall(message.encode('utf8'))
 while True :
     response = sock.recv(65536)
     if  not response : break
+    #!!!! Print Header to stderr
     print (response.decode('utf8'))
+    #!!!!! Print Body to stdout
 #'utf-16'
 
 # Close the connection
