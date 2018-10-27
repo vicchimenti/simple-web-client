@@ -55,15 +55,17 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((host, port))
 
 # prepare message for server
-message = "GET "  + path + " HTTP/1.1\n\n"
+message = "GET "  + path + " HTTP/1.1 close\n\n"
 print ("Here is your message: " + message)
 sock.send(message.encode('ascii'))
-sys.exit()
 while True:
         response = sock.recv(1024)
         if response == "": break
-        print (response.decode('ascii')),
+        print ("recving")
+        print (response.decode('ascii'))
+        #sys.exit()
 
 # Close the connection
 sock.close()
 print ("Success! Connection Closed")
+sys.exit()
