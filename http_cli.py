@@ -1,3 +1,12 @@
+# Vic Chimenti
+# CPSC 5510 FQ18
+# http_cli.py
+# Created           10/19/2018
+# Last Modified     10/27/2018
+# Simple Web Client in Python
+
+
+
 import socket
 import sys
 
