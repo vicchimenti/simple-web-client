@@ -9,26 +9,39 @@ port = 80
 user_input = sys.argv[1]
 print("user_input: " + user_input)
 
+
+
+
 # parse user_input to expose full URL
 delim = "//"
 x = user_input.find(delim)
 print("x //: " + str(x))
+
+# if no http:// protocol was entered by the user
 if x == -1 :
     full_URL = user_input
     print("full URL if: " + full_URL)
+
+# if an http:// protocol was entered with the URL
 else :
     protocol, full_URL = (user_input.split(delim , 2))
     print("full URL else: " + full_URL)
+
+
 
 
 # search for user provided port number
 delim = ":"
 x = full_URL.find(delim)
 print("x :: " + str(x))
+
+# if there is no colon in the user input
 if x != -1 :
+    # parse the host domain from the full URL
     host, portPathway = (full_URL.split(delim, 2))
     print("host if: " + host)
     print("portPath if: " + portPathway)
+    #parse domain from path
     delim = "/"
     x = portPathway.find(delim)
     portstr = portPathway[:x]
@@ -36,7 +49,10 @@ if x != -1 :
     print("host if: " + host)
     print("Path if: " + path)
     print("portstr if: " + portstr)
+    #convert the port number into an integer
     port = int(portstr)
+
+# if there is a colon in the user input
 else :
     # parse domain from path
     delim = "/"
@@ -48,21 +64,32 @@ else :
 
 
 
+
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 
 # Connect as client to a selected server
 sock.connect((host, port))
 
+
 # prepare message for server
-message = "GET "  + path + "HTTP/1.1\n\n"
-print ("Here is your message: " + message)
-sys.exit()
-sock.send(message.encode('ascii'))
-while True:
-        response = sock.recv(1024)
-        if response == "": break
-        print (response.decode('ascii')),
+message = "GET "  + path + " HTTP/1.1\r\nConnection: close\r\nHost: " + host + "\r\n\r\n"
+print ("Here is your message: \n" + message)
+
+#TODO Print GET Message to stderr / cerr
+
+
+# send message to the web server
+sock.sendall(message.encode('utf-8'))
+
+
+# wait for entire response
+while True :
+    response = sock.recv(65536)
+    if  not response : break
+    print (response.decode('utf-8'))
+
 
 # Close the connection
 sock.close()
