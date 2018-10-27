@@ -9,24 +9,36 @@ port = 80
 user_input = sys.argv[1]
 print("user_input: " + user_input)
 
-#parse user_input to expose full URL
+# parse user_input to expose full URL
 delim = "//"
 x = user_input.find(delim)
-print("x: " + str(x))
+print("x //: " + str(x))
 if x == -1 :
     full_URL = user_input
 else :
-    li = list(user_input.split("//" , 2))
+    li = list(user_input.split(delim , 2))
     full_URL = li[1]
 print("full URL: " + full_URL)
 
-
-#parse domain from path
-delim = "/"
+# search for user provided port number
+delim = ":"
 x = full_URL.find(delim)
-#li = (full_URL.split(full_URL[x]))
-host = full_URL[:x]
-path = full_URL[x:]
+print("x :: " + str(x))
+if x != -1 :
+    li = list(full_URL.split(delim, 2))
+    domain = li[0]
+    portPathway = li[1]
+    print("domain: " + domain)
+    print("portPath: " + portPathway)
+else
+    # parse domain from path
+    delim = "/"
+    x = full_URL.find(delim)
+    host = full_URL[:x]
+    path = full_URL[x:]
+
+
+
 print("host: " + host)
 print("Path: " + path)
 
