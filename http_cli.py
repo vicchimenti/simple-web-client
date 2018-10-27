@@ -93,22 +93,37 @@ except :
 else :
     print (message)
 
-# !!!!!!!    TODO Print GET Message to stderr / cerr !!!!!
+
 
 
 # send message to the web server
 sock.sendall(message.encode('utf8'))
 
-
+#delim = "\r\n\r\n"
 # wait for entire response
+#response = sock.recv(65536)
+full_response = "\r\n"
 while True :
     response = sock.recv(65536)
+    full_response.join([response, full_response])
     if  not response : break
-    #!!!! Print Header to stderr
-    print (response.decode('utf8'))
-    #!!!!! Print Body to stdout
-#'utf-16'
+print (full_response.decode('utf8'))
+#print ("response_body: " + response_body.decode('utf8'))
+
+
+
+
 
 # Close the connection
 sock.close()
-print ("Success! Connection Closed")
+#print ("Success! Connection Closed")
+
+
+#        try :
+#            response_header = response
+#        except :
+#            tb = sys.exc_info()
+#            print ("EXCEPTION: \n" + tb)
+#            sys.exit()
+#        else :
+#            print("response_header: " + response_header.decode('utf8'))
