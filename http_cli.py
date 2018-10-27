@@ -55,15 +55,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((host, port))
 
 # prepare message for server
-message = "GET "  + path + " HTTP/1.1 close\n\n"
-print ("Here is your message: " + message)
+message = "GET "  + path + " HTTP/1.1\r\nConnection: close\r\nHost: " + host + "\r\n\r\n"
+print ("Here is your message: \n" + message)
 sock.send(message.encode('ascii'))
-while True:
-        response = sock.recv(1024)
-        if response == "": break
-        print ("recving")
-        print (response.decode('ascii'))
-        #sys.exit()
+#while True:
+response = sock.recv(1024)
+#if response == "": break
+#print ("recving")
+#print (response.decode('ascii'))
+#sys.exit()
 
 # Close the connection
 sock.close()
