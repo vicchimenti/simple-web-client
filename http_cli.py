@@ -26,10 +26,13 @@ x = full_URL.find(delim)
 print("x :: " + str(x))
 if x != -1 :
     li = list(full_URL.split(delim, 2))
-    domain = li[0]
+    host = li[0]
     portPathway = li[1]
-    print("domain: " + domain)
+    print("host: " + host)
     print("portPath: " + portPathway)
+    delim = "/"
+    port = portPathway[:delim]
+    path = portPathway[delim:]
 else
     # parse domain from path
     delim = "/"
