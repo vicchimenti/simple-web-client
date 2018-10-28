@@ -136,14 +136,22 @@ else :
     # path is not an image type
     print ("else")
     byte_file = open('tempFile.txt', 'wb')
-    
+
     # receive message back from server in byte stream
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
         byte_file.write(response)
         if  not response : break
-    #print(open('tempFile.txt').read())
+
+    # split the response into header and body
+    #byte_contents = bytearray()
+    with open('tempFile.txt', 'rb') as f:
+        data = f.read()
+    byte_header, byte_body = (data.split(delim_in_bytes, 2))
+    print ("\n byte_header \n")
+    print (byte_header)
+
 
 
 
