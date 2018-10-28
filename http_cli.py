@@ -17,7 +17,6 @@ port = 80
 
 # get user input from command line
 user_input = sys.argv[1]
-#print("user_input: " + user_input)
 
 
 
@@ -25,15 +24,12 @@ user_input = sys.argv[1]
 # parse user_input to expose full URL
 delim = "//"
 x = user_input.find(delim)
-#print("x //: " + str(x))
 
 # if no http:// protocol was entered by the user
 if x == -1 : full_URL = user_input
-    #print("full URL if: " + full_URL)
 
 # if an http:// protocol was entered with the URL
 else : protocol, full_URL = (user_input.split(delim , 2))
-    #print("full URL else: " + full_URL)
 
 
 
@@ -47,16 +43,11 @@ x = full_URL.find(delim)
 if x != -1 :
     # parse the host domain from the full URL
     host, portPathway = (full_URL.split(delim, 2))
-    #print("host if: " + host)
-    #print("portPath if: " + portPathway)
     #parse domain from path
     delim = "/"
     x = portPathway.find(delim)
     portstr = portPathway[:x]
     path = portPathway[x:]
-    #print("host if: " + host)
-    #print("Path if: " + path)
-    #print("portstr if: " + portstr)
     #convert the port number into an integer
     port = int(portstr)
 
@@ -67,8 +58,6 @@ else :
     x = full_URL.find(delim)
     host = full_URL[:x]
     path = full_URL[x:]
-    #print("host else: " + host)
-    #print("Path else: " + path)
 
 
 
@@ -99,31 +88,46 @@ else :
 # send message to the web server
 sock.sendall(message.encode('utf8'))
 
-#delim = "\r\n\r\n"
 # wait for entire response
-#response = sock.recv(65536)
-full_response = "\r\n"
+full_response = "\n"
 while True :
+    # max receive size is 2^16
     response = sock.recv(65536)
-    full_response.join([response, full_response])
+    # decode bytes to string format
+    response_str = response.decode('utf8')
+    # concatenate string while receive loop lives
+    full_response += response_str
+    # end loop when server response is complete
     if  not response : break
-print (full_response.decode('utf8'))
-#print ("response_body: " + response_body.decode('utf8'))
+
+# print full response as a string
+print (full_response)
 
 
 
 
+# search for end of header
+try :
+    delim = "\r\n\r\n"
+    x = full_response.find(delim)
+    print("x :: " + str(x))
+    # if there is no delimiter
+    if x != -1 :
+        # parse the host domain from the full URL
+        message_header, message_body = (full_response.split(delim, 2))
+    else : print ("ERROR, Incorrect Header Response")
+except :
+    tb = sys.exc_info()
+    print ("EXCEPTION: \n" + tb)
+else : print (message_header)
+
+
+
+
+# display message body
+print (message_body)
 
 # Close the connection
 sock.close()
-#print ("Success! Connection Closed")
 
-
-#        try :
-#            response_header = response
-#        except :
-#            tb = sys.exc_info()
-#            print ("EXCEPTION: \n" + tb)
-#            sys.exit()
-#        else :
-#            print("response_header: " + response_header.decode('utf8'))
+# eof
