@@ -86,13 +86,7 @@ else :
 # send message to the web server
 sock.sendall(message.encode('utf-8'))
 
-# receive message back from server in byte stream
-byte_file = open('tempFile.txt', 'wb')
-while True :
-    # max receive size is 2^16
-    response = sock.recv(65536)
-    byte_file.write(response)
-    if  not response : break
+
 # troubleshooting stdout *****************
 #print("\nfull_response : \n")
 # prints the raw byte stream of a video file
@@ -118,29 +112,10 @@ xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
 
-print ("if 1:")
 
+
+# if not an image file
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
-    print ("if :")
-    with open('tempFile.txt', 'rt') as f:
-        data = f.read()
-    #text_file = open('tempFile.txt', 'rt')
-    print(data)
-    #print(open('tempFile.txt').read())
-    #full_response = byte_file.decode('utf-8')
-    #print(full_response)
-else :
-    print ("else")
-sys.exit()
-
-
-
-
-
-
-
-# print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
-if not any ((x, xy, xyz, xyzz)) :
     # path is not an image type
     while True :
         # max receive size is 2^16
@@ -150,67 +125,33 @@ if not any ((x, xy, xyz, xyzz)) :
         # concatenate string while receive loop lives
         full_response += response_str
         if  not response : break
-    #declare header and body variables
-    header = body = '\n'
-    # parse the response search for end of header
-    try :
-        x = full_response.find(delim)
-        # if the delimiter is found extract the header and body
-        if x != -1 :
-            header = full_response[:x]
-            body = full_response[x:]
-            # add the delimiter back to the end of the header
-            header += delim
-            #remove the delimiter from the front of the body
-            body = body.replace(delim, '\n', 1)
-        else : print ("ERROR, Incorrect Header")
-    except :
-        tb = sys.exc_info()
-        print ("EXCEPTION: \n" + tb)
-    else : print (header)
-
-    # display message body
-    print (body)
-    # Close the connection
-    sock.close()
-    sys.exit()
-
-
-
+    response_header = response_body = '\n'
+    response_header, response_body = (full_response.split(delim, 2))
+    print(response_body)
+    print(response_header)
+# else file is an image type
 else :
-    #path is an image type
+    # path is not an image type
+    print ("else")
+    byte_file = open('tempFile.txt', 'wb')
+    # receive message back from server in byte stream
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
-        if  response.find(delim_in_bytes) : break
-        else :
-            # decode bytes to string format
-            response_str = response.decode('utf-8')
-            # concatenate string while receive loop lives
-            full_response += response_str
+        byte_file.write(response)
+        if  not response : break
+    print(open('tempFile.txt').read())
 
-    #response = bytes(mutable_response)
-    print(full_response)
-    # Close the connection
-    sock.close()
-    sys.exit()
 
 
 
 
 sys.exit()
-#sys.exit()
-# sys.exit()
-# print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
-# wait for entire response
-
-
-
 
 
 
 
 # Close the connection
-#sock.close()
+sock.close()
 
 # eof
