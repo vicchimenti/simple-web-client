@@ -118,8 +118,6 @@ except :
 else : print (header)
 
 
-
-
 # display message body
 print (body)
 
