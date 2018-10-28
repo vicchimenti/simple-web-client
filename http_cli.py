@@ -95,7 +95,10 @@ while True :
     if  not response : break
 # troubleshooting stdout *****************
 print("\nfull_response : \n")
-print(open('tempFile.txt').read())
+with open('tempFile.txt', 'rb') as f:
+    data = f.read()
+print(data)
+#print(open('tempFile.txt').read())
 
 
 
