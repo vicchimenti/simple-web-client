@@ -127,6 +127,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         if  not response : break
     response_header = response_body = '\n'
     response_header, response_body = (full_response.split(delim, 2))
+    response_header += delim
     print(response_body)
     print(response_header)
 # else file is an image type
