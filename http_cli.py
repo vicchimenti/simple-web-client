@@ -102,17 +102,28 @@ xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
 print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
-sys.exit()
-
+if not any ((x, xy, xyz, xyzz)) :
+    while True :
+        # max receive size is 2^16
+        response = sock.recv(65536)
+        # decode bytes to string format
+        response_str = response.decode('utf-8')
+        # concatenate string while receive loop lives
+        full_response += response_str
+        if  not response : break
+else :
+    while True :
+        # max receive size is 2^16
+        response = sock.recv(65536)
+        # decode bytes to string format
+        response_str = response.decode('utf-8')
+        # concatenate string while receive loop lives
+        full_response += response_str
+        if  not response : break
+# sys.exit()
+# print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
 # wait for entire response
-while True :
-    # max receive size is 2^16
-    response = sock.recv(65536)
-    # decode bytes to string format
-    response_str = response.decode('utf-8')
-    # concatenate string while receive loop lives
-    full_response += response_str
-    if  not response : break
+
 
 
 
