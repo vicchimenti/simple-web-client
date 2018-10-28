@@ -93,6 +93,7 @@ sock.sendall(message.encode('utf-8'))
 full_response = "\n"
 delim = "\r\n\r\n"
 delim_in_bytes = delim.encode('utf-8')
+mutable_response = bytearray(b'\x00\x0F')
 png = '.png'
 jpg = '.jpg'
 gif = '.gif'
@@ -101,8 +102,9 @@ x = path.find(png)
 xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
-print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
+# print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
 if not any ((x, xy, xyz, xyzz)) :
+    # path is not an image type
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
@@ -111,15 +113,51 @@ if not any ((x, xy, xyz, xyzz)) :
         # concatenate string while receive loop lives
         full_response += response_str
         if  not response : break
+    #declare header and body variables
+    header = body = '\n'
+    # parse the response search for end of header
+    try :
+        x = full_response.find(delim)
+        # if the delimiter is found extract the header and body
+        if x != -1 :
+            header = full_response[:x]
+            body = full_response[x:]
+            # add the delimiter back to the end of the header
+            header += delim
+            #remove the delimiter from the front of the body
+            body = body.replace(delim, '\n', 1)
+        else : print ("ERROR, Incorrect Header")
+    except :
+        tb = sys.exc_info()
+        print ("EXCEPTION: \n" + tb)
+    else : print (header)
+
+    # display message body
+    print (body)
+    # Close the connection
+    sock.close()
+    sys.exit()
+
+
+
 else :
+    #path is an image type
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
-        # decode bytes to string format
-        response_str = response.decode('utf-8')
-        # concatenate string while receive loop lives
-        full_response += response_str
-        if  not response : break
+        if  response.find(delim_in_bytes) : break
+        else :
+            # decode bytes to string format
+            response_str = response.decode('utf-8')
+            # concatenate string while receive loop lives
+            full_response += response_str
+
+    #response = bytes(mutable_response)
+    print(full_response)
+    # Close the connection
+    sock.close()
+    sys.exit()
+    
 # sys.exit()
 # print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
 # wait for entire response
@@ -128,30 +166,9 @@ else :
 
 
 
-#declare header and body variables
-header = body = '\n'
-# parse the response search for end of header
-try :
-    x = full_response.find(delim)
-    # if the delimiter is found extract the header and body
-    if x != -1 :
-        header = full_response[:x]
-        body = full_response[x:]
-        # add the delimiter back to the end of the header
-        header += delim
-        #remove the delimiter from the front of the body
-        body = body.replace(delim, '\n', 1)
-    else : print ("ERROR, Incorrect Header")
-except :
-    tb = sys.exc_info()
-    print ("EXCEPTION: \n" + tb)
-else : print (header)
 
-
-# display message body
-print (body)
 
 # Close the connection
-sock.close()
+#sock.close()
 
 # eof
