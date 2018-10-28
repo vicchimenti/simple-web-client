@@ -94,15 +94,16 @@ while True :
     byte_file.write(response)
     if  not response : break
 # troubleshooting stdout *****************
-print("\nfull_response : \n")
-with open('tempFile.txt', 'rb') as f:
-    data = f.read()
-print(data)
+#print("\nfull_response : \n")
+# prints the raw byte stream of a video file
+#with open('tempFile.txt', 'rb') as f:
+#    data = f.read()
+#print(data)
 #print(open('tempFile.txt').read())
 
 
 
-sys.exit()
+
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
 delim = "\r\n\r\n"
@@ -116,6 +117,22 @@ x = path.find(png)
 xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
+
+print ("if 1:")
+
+if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+    print ("if :")
+    #** this workds for bytes  print(open('tempFile.txt').read())
+    #full_response = byte_file.decode('utf-8')
+    #print(full_response)
+else :
+    print ("else")
+sys.exit()
+
+
+
+
+
 
 
 # print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
@@ -178,6 +195,7 @@ else :
 
 
 sys.exit()
+#sys.exit()
 # sys.exit()
 # print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
 # wait for entire response
