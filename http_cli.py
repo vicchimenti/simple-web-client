@@ -87,7 +87,7 @@ else :
 
 
 # send message to the web server
-sock.sendall(message.encode('utf8'))
+sock.sendall(message.encode('utf-8'))
 
 # wait for entire response
 full_response = "\n"
@@ -95,7 +95,7 @@ while True :
     # max receive size is 2^16
     response = sock.recv(65536)
     # decode bytes to string format
-    response_str = response.decode('utf8')
+    response_str = response.decode('utf-8')
     # concatenate string while receive loop lives
     full_response += response_str
     if  not response : break
@@ -103,6 +103,8 @@ while True :
 
 
 
+#declare header and body variables
+header = body = full_response
 # parse the response search for end of header
 try :
     delim = "\r\n\r\n"
