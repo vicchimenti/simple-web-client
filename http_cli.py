@@ -7,9 +7,10 @@
 # usr/bin/python3
 
 
-
 import socket
 import sys
+
+
 
 
 # default port number to 80
@@ -37,23 +38,22 @@ else : protocol, full_URL = (user_input.split(delim , 2))
 # search for user provided port number
 delim = ":"
 x = full_URL.find(delim)
-#print("x :: " + str(x))
 
-# if there is no colon in the user input
+# if there is a colon in the user input
 if x != -1 :
     # parse the host domain from the full URL
     host, portPathway = (full_URL.split(delim, 2))
-    #parse domain from path
+    # now parse the port number from the path with a new delimiter
     delim = "/"
     x = portPathway.find(delim)
     portstr = portPathway[:x]
     path = portPathway[x:]
-    #convert the port number into an integer
+    #convert the port number from a string into an integer
     port = int(portstr)
 
-# if there is a colon in the user input
+# if there is no colon in the user input
 else :
-    # parse domain from path
+    # parse domain from path with new delimiter
     delim = "/"
     x = full_URL.find(delim)
     host = full_URL[:x]
@@ -65,9 +65,10 @@ else :
 # Set up a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-
-# Connect as client to a selected server
+# Connect to the server as a client
 sock.connect((host, port))
+
+
 
 
 # prepare message for server and display
@@ -97,40 +98,30 @@ while True :
     response_str = response.decode('utf8')
     # concatenate string while receive loop lives
     full_response += response_str
-    # end loop when server response is complete
     if  not response : break
 
-# print full response as a string
-#print (full_response)
 
 
 
-
-# search for end of header
+# parse the response search for end of header
 try :
     delim = "\r\n\r\n"
     x = full_response.find(delim)
-    print("x :: " + str(x))
-    # if there is no delimiter
+    # if the delimiter is found extract the header and body
     if x != -1 :
-        # parse the host domain from the full URL
-            #x = full_URL.find(delim)
-            #host = full_URL[:x]
-            #path = full_URL[x:]
-        message_header = full_response[:x]
-        message_body = full_response[x:]
-        #message_header, message_body = (full_response.split(delim, 2))
-    else : print ("ERROR, Incorrect Header Response")
+        header = full_response[:x]
+        body = full_response[x:]
+    else : print ("ERROR, Incorrect Header")
 except :
     tb = sys.exc_info()
     print ("EXCEPTION: \n" + tb)
-else : print (message_header)
+else : print (header)
 
 
 
 
 # display message body
-print (message_body)
+print (body)
 
 # Close the connection
 sock.close()
