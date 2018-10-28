@@ -101,7 +101,7 @@ while True :
     if  not response : break
 
 # print full response as a string
-print (full_response)
+#print (full_response)
 
 
 
@@ -114,7 +114,12 @@ try :
     # if there is no delimiter
     if x != -1 :
         # parse the host domain from the full URL
-        message_header, message_body = (full_response.split(delim, 2))
+            #x = full_URL.find(delim)
+            #host = full_URL[:x]
+            #path = full_URL[x:]
+        message_header = full_response[:x]
+        message_body = full_response[x:]
+        #message_header, message_body = (full_response.split(delim, 2))
     else : print ("ERROR, Incorrect Header Response")
 except :
     tb = sys.exc_info()
