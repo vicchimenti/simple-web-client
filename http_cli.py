@@ -122,7 +122,11 @@ print ("if 1:")
 
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     print ("if :")
-    #** this workds for bytes  print(open('tempFile.txt').read())
+    with open('tempFile.txt', 'rt') as f:
+        data = f.read()
+    #text_file = open('tempFile.txt', 'rt')
+    print(data)
+    #print(open('tempFile.txt').read())
     #full_response = byte_file.decode('utf-8')
     #print(full_response)
 else :
