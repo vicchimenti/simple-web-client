@@ -1,6 +1,7 @@
 
 
-
+    print(response_body)
+    print(response_header)
 
 
 

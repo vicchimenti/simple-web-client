@@ -116,43 +116,45 @@ xyzz = path.find(pdf)
 
 # if not an image file
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+
     # path is not an image type
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
         # decode bytes to string format
-        response_str = response.decode('utf-8')
-        # concatenate string while receive loop lives
-        full_response += response_str
+        full_response += response.decode('utf-8')
         if  not response : break
-    response_header = response_body = '\n'
+
+    # split the response into a header and a body
     response_header, response_body = (full_response.split(delim, 2))
+    # re-add delimiter to header
     response_header += delim
-    print(response_body)
-    print(response_header)
+
 # else file is an image type
 else :
+
     # path is not an image type
     print ("else")
     byte_file = open('tempFile.txt', 'wb')
+    
     # receive message back from server in byte stream
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
         byte_file.write(response)
         if  not response : break
-    print(open('tempFile.txt').read())
+    #print(open('tempFile.txt').read())
 
 
 
 
 
-sys.exit()
+
 
 
 
 
 # Close the connection
 sock.close()
-
+sys.exit()
 # eof
