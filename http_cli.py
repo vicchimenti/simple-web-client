@@ -86,18 +86,20 @@ else :
 # send message to the web server
 sock.sendall(message.encode('utf-8'))
 
-byte_file = open(tempFile.txt, 'wb')
+# receive message back from server in byte stream
+byte_file = open('tempFile.txt', 'wb')
 while True :
     # max receive size is 2^16
     response = sock.recv(65536)
-    byte_file.write(response, 'rb')
-    # decode bytes to string format
-    #response_str = response.decode('utf-8')
-    # concatenate string while receive loop lives
-    #full_response += response_str
+    byte_file.write(response)
     if  not response : break
+# troubleshooting stdout *****************
+print("\nfull_response : \n")
+print(open('tempFile.txt').read())
 
 
+
+sys.exit()
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
 delim = "\r\n\r\n"
@@ -169,6 +171,10 @@ else :
     sock.close()
     sys.exit()
 
+
+
+
+sys.exit()
 # sys.exit()
 # print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
 # wait for entire response
