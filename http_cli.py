@@ -86,7 +86,16 @@ else :
 # send message to the web server
 sock.sendall(message.encode('utf-8'))
 
-
+byte_file = open(tempFile.txt, 'wb')
+while True :
+    # max receive size is 2^16
+    response = sock.recv(65536)
+    byte_file.write(response, 'rb')
+    # decode bytes to string format
+    #response_str = response.decode('utf-8')
+    # concatenate string while receive loop lives
+    #full_response += response_str
+    if  not response : break
 
 
 # declare parsing variables and scrub for non-HTML/txt file type
@@ -102,6 +111,8 @@ x = path.find(png)
 xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
+
+
 # print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
 if not any ((x, xy, xyz, xyzz)) :
     # path is not an image type
@@ -157,7 +168,7 @@ else :
     # Close the connection
     sock.close()
     sys.exit()
-    
+
 # sys.exit()
 # print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
 # wait for entire response
