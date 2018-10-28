@@ -83,14 +83,28 @@ except :
 else :
     print (message)
 
-
-
-
 # send message to the web server
 sock.sendall(message.encode('utf-8'))
 
-# wait for entire response
+
+
+
+# declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
+delim = "\r\n\r\n"
+delim_in_bytes = delim.encode('utf-8')
+png = '.png'
+jpg = '.jpg'
+gif = '.gif'
+pdf = '.pdf'
+x = path.find(png)
+xy = path.find(jpg)
+xyz = path.find(gif)
+xyzz = path.find(pdf)
+print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
+sys.exit()
+
+# wait for entire response
 while True :
     # max receive size is 2^16
     response = sock.recv(65536)
@@ -107,7 +121,6 @@ while True :
 header = body = '\n'
 # parse the response search for end of header
 try :
-    delim = "\r\n\r\n"
     x = full_response.find(delim)
     # if the delimiter is found extract the header and body
     if x != -1 :
