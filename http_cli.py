@@ -2,7 +2,7 @@
 # CPSC 5510 FQ18
 # http_cli.py
 # Created           10/19/2018
-# Last Modified     10/27/2018
+# Last Modified     10/28/2018
 # Simple Web Client in Python3
 # usr/bin/python3
 
@@ -104,7 +104,7 @@ while True :
 
 
 #declare header and body variables
-header = body = full_response
+header = body = '\n'
 # parse the response search for end of header
 try :
     delim = "\r\n\r\n"
@@ -113,6 +113,10 @@ try :
     if x != -1 :
         header = full_response[:x]
         body = full_response[x:]
+        # add the delimiter back to the end of the header
+        header += delim
+        #remove the delimiter from the front of the body
+        body = body.replace(delim, '\n', 1)
     else : print ("ERROR, Incorrect Header")
 except :
     tb = sys.exc_info()
