@@ -102,7 +102,8 @@ sock.sendall(message.encode('utf-8'))
 full_response = "\n"
 delim = "\r\n\r\n"
 delim_in_bytes = delim.encode('utf-8')
-mutable_response = bytearray(b'\x00\x0F')
+#mutable_response = bytearray(b'\x00\x0F')
+byte_file = open('tempFile.txt', 'wb')
 png = '.png'
 jpg = '.jpg'
 gif = '.gif'
@@ -114,10 +115,11 @@ xyzz = path.find(pdf)
 
 
 
+
 # if not an image file
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
-    # path is not an image type
+    # receive message from server and decode from bytes
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
@@ -125,17 +127,8 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         full_response += response.decode('utf-8')
         if  not response : break
 
-    # split the response into a header and a body
-    response_header, response_body = (full_response.split(delim, 2))
-    # re-add delimiter to header
-    response_header += delim
-
 # else file is an image type
 else :
-
-    # path is not an image type
-    print ("else")
-    byte_file = open('tempFile.txt', 'wb')
 
     # receive message back from server in byte stream
     while True :
@@ -144,23 +137,18 @@ else :
         byte_file.write(response)
         if  not response : break
 
-    # split the response into header and body
-    with open('tempFile.txt', 'rb') as f:
-        data = f.read()
-    byte_header, image_body = (data.split(delim_in_bytes, 2))
-
-    # decode the header
-    image_header = byte_header.decode('utf-8')
-    image_header += delim
 
 
 
-
-# response received and processed : display results
+# process response, store data in variables and display results
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+
     # if not an image file
     try :
-        stderr(response_header)
+        # split the response into a header and a body
+        response_header, response_body = (full_response.split(delim, 2))
+        # re-add delimiter to header
+        response_header += delim
     except :
         tb = sys.exc_info()
         print ("EXCEPTION: \n" + tb)
@@ -171,9 +159,16 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     stdout(response_body)
 
 else :
+    
     # if image file
     try :
-        stderr(image_header)
+        # split the response into header and body
+        with open('tempFile.txt', 'rb') as f:
+            data = f.read()
+        byte_header, image_body = (data.split(delim_in_bytes, 2))
+        # decode the header
+        image_header = byte_header.decode('utf-8')
+        image_header += delim
     except :
         tb = sys.exc_info()
         print ("EXCEPTION: \n" + tb)
