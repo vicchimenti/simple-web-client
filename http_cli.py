@@ -71,29 +71,21 @@ sock.connect((host, port))
 
 
 
-# prepare message for server and display
+# prepare message for server
+message = "GET "  + path \
+                  + " HTTP/1.1\r\nConnection: close\r\nHost: " \
+                  + host \
+                  + "\r\n\r\n"
+
+# display GET Request
 try :
-    message = "GET "  + path \
-                      + " HTTP/1.1\r\nConnection: close\r\nHost: " \
-                      + host \
-                      + "\r\n\r\n"
+    sys.stderr.write(message)
 except :
     tb = sys.exc_info()
     print ("EXCEPTION: \n" + tb)
-else :
-    print (message)
 
 # send message to the web server
 sock.sendall(message.encode('utf-8'))
-
-
-# troubleshooting stdout *****************
-#print("\nfull_response : \n")
-# prints the raw byte stream of a video file
-#with open('tempFile.txt', 'rb') as f:
-#    data = f.read()
-#print(data)
-#print(open('tempFile.txt').read())
 
 
 
@@ -102,7 +94,6 @@ sock.sendall(message.encode('utf-8'))
 full_response = "\n"
 delim = "\r\n\r\n"
 delim_in_bytes = delim.encode('utf-8')
-#mutable_response = bytearray(b'\x00\x0F')
 byte_file = open('tempFile.txt', 'wb')
 png = '.png'
 jpg = '.jpg'
@@ -116,27 +107,37 @@ xyzz = path.find(pdf)
 
 
 
-# if not an image file
+# receive response from server/ check for file type
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # receive message from server and decode from bytes
     while True :
-        # max receive size is 2^16
+        # not an image file type
         response = sock.recv(65536)
-        # decode bytes to string format
         full_response += response.decode('utf-8')
         if  not response : break
 
-# else file is an image type
+    # split the response into a header and a body
+    response_header, response_body = (full_response.split(delim, 2))
+    # re-add delimiter to header
+    response_header += delim
+
 else :
 
     # receive message back from server in byte stream
     while True :
-        # max receive size is 2^16
+        # image file type
         response = sock.recv(65536)
         byte_file.write(response)
         if  not response : break
 
+    # split the response into header and body
+    with open('tempFile.txt', 'rb') as f:
+        data = f.read()
+    byte_header, image_body = (data.split(delim_in_bytes, 2))
+    # decode the header
+    image_header = byte_header.decode('utf-8')
+    image_header += delim
 
 
 
@@ -144,32 +145,21 @@ else :
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     # if not an image file
     try :
-        # split the response into a header and a body
-        response_header, response_body = (full_response.split(delim, 2))
-        # re-add delimiter to header
-        response_header += delim
+        sys.stderr.write(response_header)
     except :
         tb = sys.exc_info()
         print ("EXCEPTION: \n" + tb)
-    else :
-        print(response_header)
+
     # print message body
     sys.stdout.write(response_body)
 else :
     # if image file
     try :
-        # split the response into header and body
-        with open('tempFile.txt', 'rb') as f:
-            data = f.read()
-        byte_header, image_body = (data.split(delim_in_bytes, 2))
-        # decode the header
-        image_header = byte_header.decode('utf-8')
-        image_header += delim
+        sys.stderr.write(image_header)
     except :
         tb = sys.exc_info()
         print ("EXCEPTION: \n" + tb)
-    else :
-        print(image_header)
+
     # print message body
     sys.stdout.buffer.write(image_body)
 
