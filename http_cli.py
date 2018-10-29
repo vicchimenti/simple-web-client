@@ -142,7 +142,6 @@ else :
 
 # process response, store data in variables and display results
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
-
     # if not an image file
     try :
         # split the response into a header and a body
@@ -154,12 +153,9 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         print ("EXCEPTION: \n" + tb)
     else :
         print(response_header)
-
     # print message body
     sys.stdout.write(response_body)
-
 else :
-
     # if image file
     try :
         # split the response into header and body
@@ -174,7 +170,6 @@ else :
         print ("EXCEPTION: \n" + tb)
     else :
         print(image_header)
-
     # print message body
     sys.stdout.buffer.write(image_body)
 
