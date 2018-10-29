@@ -145,19 +145,43 @@ else :
         if  not response : break
 
     # split the response into header and body
-    #byte_contents = bytearray()
     with open('tempFile.txt', 'rb') as f:
         data = f.read()
-    byte_header, byte_body = (data.split(delim_in_bytes, 2))
-    print ("\n byte_header \n")
-    print (byte_header)
+    byte_header, image_body = (data.split(delim_in_bytes, 2))
+
+    # decode the header
+    image_header = byte_header.decode('utf-8')
+    image_header += delim
 
 
 
 
+# response received and processed : display results
+if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+    # if not an image file
+    try :
+        stderr(response_header)
+    except :
+        tb = sys.exc_info()
+        print ("EXCEPTION: \n" + tb)
+    else :
+        print(response_header)
 
+    # print message body
+    stdout(response_body)
 
+else :
+    # if image file
+    try :
+        stderr(image_header)
+    except :
+        tb = sys.exc_info()
+        print ("EXCEPTION: \n" + tb)
+    else :
+        print(image_header)
 
+    # print message body
+    stdout(image_body)
 
 
 

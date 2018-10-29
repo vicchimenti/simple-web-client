@@ -1,7 +1,19 @@
 
 
+
+
+
+
+    print(image_header)
+
+    print ("\n byte_header \n")
+    print (byte_header)
+
     print(response_body)
     print(response_header)
+
+        print ("byte_body \n")
+        print (byte_body)
 
 
 
