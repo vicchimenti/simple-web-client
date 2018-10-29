@@ -156,10 +156,10 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         print(response_header)
 
     # print message body
-    stdout(response_body)
+    sys.stdout.write(response_body)
 
 else :
-    
+
     # if image file
     try :
         # split the response into header and body
@@ -176,7 +176,7 @@ else :
         print(image_header)
 
     # print message body
-    stdout(image_body)
+    sys.stdout.buffer.write(image_body)
 
 
 
