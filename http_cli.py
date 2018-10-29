@@ -143,7 +143,6 @@ else :
 
 # process response, store data in variables and display results
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
-
     # if not an image file
     try :
         sys.stderr.write(response_header)
@@ -153,9 +152,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # print message body
     sys.stdout.write(response_body)
-
 else :
-
     # if image file
     try :
         sys.stderr.write(image_header)
