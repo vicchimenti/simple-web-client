@@ -76,6 +76,14 @@ else :
 
 
 
+# troubleshooting stdout *****************
+#print("\nfull_response : \n")
+# prints the raw byte stream of a video file
+#with open('tempFile.txt', 'rb') as f:
+#    data = f.read()
+#print(data)
+#print(open('tempFile.txt').read())
+
 sys.exit()
 #sys.exit()
 # sys.exit()

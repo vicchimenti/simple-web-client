@@ -87,22 +87,12 @@ else :
 sock.sendall(message.encode('utf-8'))
 
 
-# troubleshooting stdout *****************
-#print("\nfull_response : \n")
-# prints the raw byte stream of a video file
-#with open('tempFile.txt', 'rb') as f:
-#    data = f.read()
-#print(data)
-#print(open('tempFile.txt').read())
-
-
 
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
 delim = "\r\n\r\n"
 delim_in_bytes = delim.encode('utf-8')
-#mutable_response = bytearray(b'\x00\x0F')
 byte_file = open('tempFile.txt', 'wb')
 png = '.png'
 jpg = '.jpg'
@@ -116,23 +106,21 @@ xyzz = path.find(pdf)
 
 
 
-# if not an image file
+# receive response from server/ check for file type
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # receive message from server and decode from bytes
     while True :
-        # max receive size is 2^16
+        # not an image file type
         response = sock.recv(65536)
-        # decode bytes to string format
         full_response += response.decode('utf-8')
         if  not response : break
 
-# else file is an image type
 else :
 
     # receive message back from server in byte stream
     while True :
-        # max receive size is 2^16
+        # image file type
         response = sock.recv(65536)
         byte_file.write(response)
         if  not response : break
