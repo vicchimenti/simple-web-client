@@ -87,13 +87,23 @@ else :
 sock.sendall(message.encode('utf-8'))
 
 
+# troubleshooting stdout *****************
+#print("\nfull_response : \n")
+# prints the raw byte stream of a video file
+#with open('tempFile.txt', 'rb') as f:
+#    data = f.read()
+#print(data)
+#print(open('tempFile.txt').read())
+
+
 
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
 delim = "\r\n\r\n"
 delim_in_bytes = delim.encode('utf-8')
-mutable_response = bytearray(b'\x00\x0F')
+#mutable_response = bytearray(b'\x00\x0F')
+byte_file = open('tempFile.txt', 'wb')
 png = '.png'
 jpg = '.jpg'
 gif = '.gif'
@@ -102,73 +112,76 @@ x = path.find(png)
 xy = path.find(jpg)
 xyz = path.find(gif)
 xyzz = path.find(pdf)
-# print("x = : " + str(x) + str(xy) + str(xyz) + str(xyzz))
-if not any ((x, xy, xyz, xyzz)) :
-    # path is not an image type
+
+
+
+
+# if not an image file
+if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+
+    # receive message from server and decode from bytes
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
         # decode bytes to string format
-        response_str = response.decode('utf-8')
-        # concatenate string while receive loop lives
-        full_response += response_str
+        full_response += response.decode('utf-8')
         if  not response : break
-    #declare header and body variables
-    header = body = '\n'
-    # parse the response search for end of header
-    try :
-        x = full_response.find(delim)
-        # if the delimiter is found extract the header and body
-        if x != -1 :
-            header = full_response[:x]
-            body = full_response[x:]
-            # add the delimiter back to the end of the header
-            header += delim
-            #remove the delimiter from the front of the body
-            body = body.replace(delim, '\n', 1)
-        else : print ("ERROR, Incorrect Header")
-    except :
-        tb = sys.exc_info()
-        print ("EXCEPTION: \n" + tb)
-    else : print (header)
 
-    # display message body
-    print (body)
-    # Close the connection
-    sock.close()
-    sys.exit()
-
-
-
+# else file is an image type
 else :
-    #path is an image type
+
+    # receive message back from server in byte stream
     while True :
         # max receive size is 2^16
         response = sock.recv(65536)
-        if  response.find(delim_in_bytes) : break
-        else :
-            # decode bytes to string format
-            response_str = response.decode('utf-8')
-            # concatenate string while receive loop lives
-            full_response += response_str
-
-    #response = bytes(mutable_response)
-    print(full_response)
-    # Close the connection
-    sock.close()
-    sys.exit()
-    
-# sys.exit()
-# print("x != -1: " + str(x) + str(xy) + str(xyz) + str(xyzz))
-# wait for entire response
+        byte_file.write(response)
+        if  not response : break
 
 
 
+
+# process response, store data in variables and display results
+if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+
+    # if not an image file
+    try :
+        # split the response into a header and a body
+        response_header, response_body = (full_response.split(delim, 2))
+        # re-add delimiter to header
+        response_header += delim
+    except :
+        tb = sys.exc_info()
+        print ("EXCEPTION: \n" + tb)
+    else :
+        print(response_header)
+
+    # print message body
+    sys.stdout.write(response_body)
+
+else :
+
+    # if image file
+    try :
+        # split the response into header and body
+        with open('tempFile.txt', 'rb') as f:
+            data = f.read()
+        byte_header, image_body = (data.split(delim_in_bytes, 2))
+        # decode the header
+        image_header = byte_header.decode('utf-8')
+        image_header += delim
+    except :
+        tb = sys.exc_info()
+        print ("EXCEPTION: \n" + tb)
+    else :
+        print(image_header)
+
+    # print message body
+    sys.stdout.buffer.write(image_body)
 
 
 
 
 # Close the connection
-#sock.close()
-
+sock.close()
+sys.exit()
 # eof
