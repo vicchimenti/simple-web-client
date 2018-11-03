@@ -112,6 +112,9 @@ except :
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
+except sys.UnicodeError as e :
+    print ("Error Encoding Message : " + e)
+    sys.exit ("Exiting Program")
 except socket.OSError as e :
     print ("ERROR Sending Data : " + e)
     sys.exit ("Exiting Program")
@@ -119,15 +122,26 @@ except socket.OSError as e :
 
 
 
+
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
 delim = "\r\n\r\n"
-delim_in_bytes = delim.encode ('utf-8')
-byte_file = open ('tempFile.txt', 'wb')
 png = '.png'
 jpg = '.jpg'
 gif = '.gif'
 pdf = '.pdf'
+
+# encode the delimiter to binary
+try :
+    delim_in_bytes = delim.encode ('utf-8')
+except sys.UnicodeError as e :
+    print ("ERROR Encoding Delimiter : " + e)
+    sys.exit ("Exiting Program")
+
+# open file for input
+byte_file = open ('tempFile.txt', 'wb')
+
+# scan path for file type
 x = path.find (png)
 xy = path.find (jpg)
 xyz = path.find (gif)
@@ -136,7 +150,7 @@ xyzz = path.find (pdf)
 
 
 
-# receive response from server/ check for file type
+# receive response from server and check for file type
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # receive message from server and decode from bytes
@@ -146,6 +160,9 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
             response = sock.recv (65536)
             full_response += response.decode ('utf-8')
             if  not response : break
+    except sys.UnicodeError as e :
+        print ("ERROR Decoding Response : " + e)
+        sys.exit ("Exiting Program")
     except socket.OSError as e :
         print ("ERROR Receiving Response: " + e)
         sys.exit ("Exiting Program")
@@ -172,8 +189,15 @@ else :
     with open ('tempFile.txt', 'rb') as f:
         data = f.read()
     byte_header, image_body = (data.split(delim_in_bytes, 2))
+
     # decode the header
-    image_header = byte_header.decode ('utf-8')
+    try :
+        image_header = byte_header.decode ('utf-8')
+    except sys.UnicodeError as e :
+        print ("ERROR Decoding Image Header : " + e)
+        sys.exit ("Exiting Program")
+
+    # add delimiter to header     
     image_header += delim
 
 
