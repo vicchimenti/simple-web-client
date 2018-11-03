@@ -70,7 +70,7 @@ try :
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 except socket.error as e :
     print ("ERROR Creating Socket: " + e)
-    sys.exit(1)
+    sys.exit("Exiting Program")
 
 
 # Connect to the server as a client
@@ -79,10 +79,10 @@ try :
     sock.connect((host, port))
 except socket.gaierror as e :
     print ("ERROR: Invalid Address : " + e)
-    sys.exit(1)
+    sys.exit("Exiting Program")
 except socket.error as e :
     print ("ERROR Connecting : " + e)
-    sys.exit(1)
+    sys.exit("Exiting Program")
 
 
 
@@ -108,7 +108,7 @@ try :
     sock.sendall(message.encode('utf-8'))
 except socket.error as e :
     print ("ERROR Sending Data : " + e)
-    sys.exit(1)
+    sys.exit("Exiting Program")
 
 
 
