@@ -10,8 +10,10 @@
 # usr/bin/python3
 
 
-import socket
-import sys
+
+
+import socket           # network sockets
+import sys              # io and error handling
 
 
 
@@ -23,7 +25,10 @@ port = 80
 try :
     user_input = sys.argv[1]
 except sys.IndexError as e :
-    print ("ERROR Command Line Input Invalid : " + e)
+    print ("ERROR No Valid Command Line Input : " + e)
+    sys.exit ("Exiting Program")
+except sys.KeyError as e :
+    print ("ERROR Invalid Command Line Entry : " + e)
     sys.exit ("Exiting Program")
 
 
