@@ -66,10 +66,23 @@ else :
 
 
 # Set up a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try :
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+except socket.error as e :
+    print "ERROR Creating Socket: %s" % e
+    sys.exit(1)
+
 
 # Connect to the server as a client
-sock.connect((host, port))
+sock.settimeout(5)
+try :
+    sock.connect((host, port))
+except socket.gaierror, e :
+    print "ERROR: Invalid Address : %s" % e
+    sys.exit(1)
+except socket.error, e :
+    print "ERROR Connecting : %s" % e
+    sys.exit(1)
 
 
 
@@ -87,8 +100,15 @@ except :
     tb = sys.exc_info()
     print ("EXCEPTION: \n" + tb)
 
+
+
+
 # send message to the web server
-sock.sendall(message.encode('utf-8'))
+try :
+    sock.sendall(message.encode('utf-8'))
+except socket.error, e :
+    print "ERROR Sending Data : %s" % e
+    sys.exit(1)
 
 
 
