@@ -72,7 +72,7 @@ else :
 # Set up a TCP/IP socket
 try :
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-except socket.error as e :
+except socket.OSError as e :
     print ("ERROR Creating Socket: " + e)
     sys.exit("Exiting Program")
 
@@ -81,10 +81,7 @@ except socket.error as e :
 sock.settimeout(5)
 try :
     sock.connect((host, port))
-except socket.gaierror as e :
-    print ("ERROR: Invalid Address : " + e)
-    sys.exit("Exiting Program")
-except socket.error as e :
+except socket.OSError as e :
     print ("ERROR Connecting : " + e)
     sys.exit("Exiting Program")
 
@@ -110,7 +107,7 @@ except :
 # send message to the web server
 try :
     sock.sendall(message.encode('utf-8'))
-except socket.error as e :
+except socket.OSError as e :
     print ("ERROR Sending Data : " + e)
     sys.exit("Exiting Program")
 
@@ -138,11 +135,14 @@ xyzz = path.find(pdf)
 if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # receive message from server and decode from bytes
-    while True :
-        # not an image file type
-        response = sock.recv(65536)
-        full_response += response.decode('utf-8')
-        if  not response : break
+    try :
+        while True :
+            # not an image file type
+            response = sock.recv(65536)
+            full_response += response.decode('utf-8')
+            if  not response : break
+    except socket.OSError as e :
+        print ("ERROR Receiving Response: " + e)
 
     # split the response into a header and a body
     response_header, response_body = (full_response.split(delim, 2))
@@ -152,11 +152,14 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 else :
 
     # receive message back from server in byte stream
-    while True :
-        # image file type
-        response = sock.recv(65536)
-        byte_file.write(response)
-        if  not response : break
+    try :
+        while True :
+            # image file type
+            response = sock.recv(65536)
+            byte_file.write(response)
+            if  not response : break
+    except socket.OSError as e :
+        print ("ERROR Receiving Response: " + e)
 
     # split the response into header and body
     with open('tempFile.txt', 'rb') as f:
