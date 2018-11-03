@@ -86,8 +86,8 @@ except socket.OSError as e :
 sock.settimeout (5)
 try :
     sock.connect ((host, port))
-except socket.OSError as e :
-    print ("ERROR Connecting : " + e)
+except OSError :
+    print ("ERROR Connecting")
     sys.exit ("Exiting Program")
 
 
@@ -197,7 +197,7 @@ else :
         print ("ERROR Decoding Image Header : " + e)
         sys.exit ("Exiting Program")
 
-    # add delimiter to header     
+    # add delimiter to header
     image_header += delim
 
 
