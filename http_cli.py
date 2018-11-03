@@ -20,7 +20,11 @@ import sys
 port = 80
 
 # get user input from command line
-user_input = sys.argv[1]
+try :
+    user_input = sys.argv[1]
+except sys.IndexError as e :
+    print ("ERROR Command Line Input Invalid : " + e)
+    sys.exit("Exiting Program")
 
 
 
