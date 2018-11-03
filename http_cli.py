@@ -69,7 +69,7 @@ else :
 try :
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 except socket.error as e :
-    print "ERROR Creating Socket: %s" % e
+    print ("ERROR Creating Socket: " + e)
     sys.exit(1)
 
 
@@ -77,11 +77,11 @@ except socket.error as e :
 sock.settimeout(5)
 try :
     sock.connect((host, port))
-except socket.gaierror, e :
-    print "ERROR: Invalid Address : %s" % e
+except socket.gaierror as e :
+    print ("ERROR: Invalid Address : " + e)
     sys.exit(1)
-except socket.error, e :
-    print "ERROR Connecting : %s" % e
+except socket.error as e :
+    print ("ERROR Connecting : " + e)
     sys.exit(1)
 
 
@@ -98,7 +98,7 @@ try :
     sys.stderr.write(message)
 except :
     tb = sys.exc_info()
-    print ("EXCEPTION: \n" + tb)
+    print ("ERROR Standard Error Write : " + tb)
 
 
 
@@ -106,8 +106,8 @@ except :
 # send message to the web server
 try :
     sock.sendall(message.encode('utf-8'))
-except socket.error, e :
-    print "ERROR Sending Data : %s" % e
+except socket.error as e :
+    print ("ERROR Sending Data : " + e)
     sys.exit(1)
 
 
