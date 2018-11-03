@@ -1,8 +1,11 @@
 # Vic Chimenti
 # CPSC 5510 FQ18
 # http_cli.py
+# v2.0
+# v2 includes updates for web server assignment
+# primary changes include better error handling
 # Created           10/19/2018
-# Last Modified     10/28/2018
+# Last Modified     11/3/2018
 # Simple Web Client in Python3
 # usr/bin/python3
 
@@ -155,7 +158,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     sys.stdout.write(response_body)
 
 else :
-    
+
     # if image file
     try :
         sys.stderr.write(image_header)
