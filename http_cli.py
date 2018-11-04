@@ -93,6 +93,9 @@ pseudoPort = str(port)
 print ("pseudoPort = " + pseudoPort)
 
 
+host_ip = socket.gethostbyname(host)
+host_ip_str = str(host_ip)
+print ("host_ip_str : " + host_ip_str)
 
 
 # Set up a TCP/IP socket
@@ -104,9 +107,9 @@ except socket.OSError as e :
 
 
 # Connect to the server as a client
-sock.settimeout (5)
+sock.setblocking(False)
 try :
-    sock.connect ((host, port))
+    sock.connect ((host_ip_str, port))
 except OSError :
     print ("ERROR Connecting")
     sys.exit ("Exiting Program")
