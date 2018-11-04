@@ -107,9 +107,9 @@ except socket.OSError as e :
 
 
 # Connect to the server as a client
-sock.setblocking(False)
+#sock.setblocking(False)
 try :
-    sock.connect ((host_ip_str, port))
+    sock.connect ((host, port))
 except OSError :
     print ("ERROR Connecting")
     sys.exit ("Exiting Program")
