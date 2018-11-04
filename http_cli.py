@@ -18,8 +18,9 @@ import sys              # io and error handling
 
 
 
-# default port number to 80
+# set defaults
 port = 80
+path = ""
 
 # get user input from command line
 try :
@@ -57,11 +58,19 @@ if x != -1 :
     host, portPathway = (full_URL.split (delim, 2))
     # now parse the port number from the path with a new delimiter
     delim = "/"
-    x = portPathway.find (delim)
-    portstr = portPathway[:x]
-    path = portPathway[x:]
-    #convert the port number from a string into an integer
-    port = int (portstr)
+    y = portPathway.find (delim)
+
+    # if there is a path after the port number
+    if y != -1 :
+        #portstr, path = (portPathway.split (delim, 2))
+        portstr = portPathway[:y]
+        path = portPathway[y:]
+        port = int (portstr)
+        print ("Portstr : " + portstr)
+        #path = delim + path
+        print ("Path if : " + path)
+    else :
+        port = int (portPathway)
 
 # if there is no colon in the user input
 else :
@@ -70,6 +79,18 @@ else :
     x = full_URL.find (delim)
     host = full_URL[:x]
     path = full_URL[x:]
+
+
+
+# TS OUTPUT
+print ("argument : " + sys.argv[1])
+print ("user_input : " + user_input)
+print ("portPathway : " + portPathway)
+print ("full_url : " + full_URL)
+print ("Path : " + path)
+print ("Host : " + host)
+pseudoPort = str(port)
+print ("pseudoPort = " + pseudoPort)
 
 
 
