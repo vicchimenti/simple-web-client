@@ -193,6 +193,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         sys.exit ("Exiting Program")
 
     # split the response into a header and a body
+    # *** TS TODO *** Search for Delimiter First before splitting
     response_header, response_body = (full_response.split(delim, 2))
     # re-add delimiter to header
     response_header += delim
