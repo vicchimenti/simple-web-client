@@ -136,6 +136,7 @@ except :
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
+    sock.shutdown(1)
 except sys.UnicodeError as e :
     print ("Error Encoding Message : " + e)
     sys.exit ("Exiting Program")
@@ -181,7 +182,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     try :
         while True :
             # not an image file type
-            response = sock.recv (65536)
+            response = sock.recv (4096)
             full_response += response.decode ('utf-8')
             if  not response : break
     except sys.UnicodeError as e :
@@ -202,7 +203,7 @@ else :
     try :
         while True :
             # image file type
-            response = sock.recv (65536)
+            response = sock.recv (4096)
             byte_file.write (response)
             if  not response : break
     except socket.OSError as e :
