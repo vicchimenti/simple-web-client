@@ -107,9 +107,9 @@ except socket.OSError as e :
 
 
 # Connect to the server as a client
-sock.setblocking(False)
+#sock.setblocking(False)
 try :
-    sock.connect ((host_ip_str, port))
+    sock.connect ((host, port))
 except OSError :
     print ("ERROR Connecting")
     sys.exit ("Exiting Program")
@@ -136,6 +136,7 @@ except :
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
+    sock.shutdown(1)
 except sys.UnicodeError as e :
     print ("Error Encoding Message : " + e)
     sys.exit ("Exiting Program")
@@ -181,7 +182,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
     try :
         while True :
             # not an image file type
-            response = sock.recv (65536)
+            response = sock.recv (4096)
             full_response += response.decode ('utf-8')
             if  not response : break
     except sys.UnicodeError as e :
@@ -192,6 +193,7 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
         sys.exit ("Exiting Program")
 
     # split the response into a header and a body
+    # *** TS TODO *** Search for Delimiter First before splitting
     response_header, response_body = (full_response.split(delim, 2))
     # re-add delimiter to header
     response_header += delim
@@ -202,7 +204,7 @@ else :
     try :
         while True :
             # image file type
-            response = sock.recv (65536)
+            response = sock.recv (4096)
             byte_file.write (response)
             if  not response : break
     except socket.OSError as e :
