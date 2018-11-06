@@ -5,7 +5,7 @@
 # v2 includes updates for web server assignment
 # primary changes include better error handling
 # Created           10/19/2018
-# Last Modified     11/3/2018
+# Last Modified     11/6/2018
 # Simple Web Client in Python3
 # usr/bin/python3
 
