@@ -7,7 +7,7 @@
 # Created           10/19/2018
 # Last Modified     11/6/2018
 # Simple Web Client in Python3
-# usr/bin/python3
+# /usr/local/python3/bin/python3
 
 
 
@@ -19,8 +19,15 @@ import sys              # io and error handling
 
 
 # set defaults
-port = 80
-path = ""
+port = 80                   # default port is 80 web server standard
+path = ""                   # declare path variable with empty string
+double_slash = "//"         # delimiter for parsing URLs
+single_slash = "/"          # delimiter for parsing URL paths
+colon = ":"                 # delimiter for parsing port numbers from URL
+endOf_header = "\r\n\r\n"   # delimiter for parsing header and body
+
+
+
 
 # get user input from command line
 try :
@@ -36,53 +43,47 @@ except sys.KeyError as e :
 
 
 # parse user_input to expose full URL
-delim = "//"
-x = user_input.find (delim)
+x = user_input.find (double_slash)
 
 # if no http:// protocol was entered by the user
 if x == -1 : full_URL = user_input
 
 # if an http:// protocol was entered with the URL
-else : protocol, full_URL = (user_input.split (delim , 2))
+else : protocol, full_URL = (user_input.split (double_slash , 2))
 
 
 
 
 # search for user provided port number
-delim = ":"
-x = full_URL.find (delim)
+x = full_URL.find (colon)
 
 # if there is a colon in the user input
 if x != -1 :
     # parse the host domain from the full URL
-    host, portPathway = (full_URL.split (delim, 2))
-    # now parse the port number from the path with a new delimiter
-    delim = "/"
-    y = portPathway.find (delim)
+    host, portPathway = (full_URL.split (colon, 2))
+    # search for a path after the port number
+    y = portPathway.find (single_slash)
 
     # if there is a path after the port number
     if y != -1 :
-        #portstr, path = (portPathway.split (delim, 2))
         portstr = portPathway[:y]
         path = portPathway[y:]
         port = int (portstr)
-        print ("Portstr : " + portstr)
-        #path = delim + path
+        print ("Portstr if : " + portstr)
         print ("Path if : " + path)
     else :
         port = int (portPathway)
 
-# if there is no colon in the user input
+# if there is no colon in the user input, then use default port
 else :
     # parse domain from path with new delimiter
-    delim = "/"
-    x = full_URL.find (delim)
+    x = full_URL.find (single_slash)
     host = full_URL[:x]
     path = full_URL[x:]
 
 
 
-# TS OUTPUT
+# ***** TS OUTPUT ********
 print ("argument : " + sys.argv[1])
 print ("user_input : " + user_input)
 print ("portPathway : " + portPathway)
@@ -121,7 +122,7 @@ except OSError :
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
-                  + "\r\n\r\n"
+                  + endOf_header
 
 # display GET Request
 try :
@@ -150,15 +151,14 @@ except socket.OSError as e :
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
-delim = "\r\n\r\n"
-png = '.png'
-jpg = '.jpg'
-gif = '.gif'
-pdf = '.pdf'
+png = ".png"
+jpg = ".jpg"
+gif = ".gif"
+pdf = ".pdf"
 
 # encode the delimiter to binary
 try :
-    delim_in_bytes = delim.encode ('utf-8')
+    delim_in_bytes = endOf_header.encode ('utf-8')
 except sys.UnicodeError as e :
     print ("ERROR Encoding Delimiter : " + e)
     sys.exit ("Exiting Program")
@@ -194,9 +194,9 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
 
     # split the response into a header and a body
     # *** TS TODO *** Search for Delimiter First before splitting
-    response_header, response_body = (full_response.split(delim, 2))
+    response_header, response_body = (full_response.split(endOf_header, 2))
     # re-add delimiter to header
-    response_header += delim
+    response_header += endOf_header
 
 else :
 
@@ -224,9 +224,10 @@ else :
         sys.exit ("Exiting Program")
 
     # add delimiter to header
-    image_header += delim
+    image_header += endOf_header
 
-
+# Close the Connection
+sock.close()
 
 
 # process response, store data in variables and display results
@@ -269,7 +270,6 @@ else :
 
 
 
-# Close the connection
-sock.close()
+# Close the program
 sys.exit()
 # eof
