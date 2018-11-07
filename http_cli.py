@@ -81,13 +81,17 @@ if x != -1 :
 else :
     # parse domain from path with new delimiter
     x = full_URL.find (single_slash)
-    host = full_URL[:x]
-    path = full_URL[x:]
+    if x != -1 :
+        host = full_URL[:x]
+        path = full_URL[x:]
+    else :
+        host = full_URL
+        path = single_slash
 
 # confirm that the path contains any value after first slash
 x = len(path)
 if x <= 1 :
-    path = ""
+    path = single_slash
 
 
 
@@ -95,7 +99,7 @@ if x <= 1 :
 # ***** TS OUTPUT ********
 print ("argument : " + sys.argv[1])
 print ("user_input : " + user_input)
-print ("portPathway : " + portPathway)
+#print ("portPathway : " + portPathway)
 print ("full_url : " + full_URL)
 print ("Path : " + path)
 print ("Host : " + host)
@@ -108,8 +112,8 @@ print ("pseudoPort = " + pseudoPort)
 # validate URL entered and assign host IP number
 try :
     host_ip = socket.gethostbyname(host)
-except : sys.OSError as e
-    print ("ERROR Invalid URL Entered : " + e)
+except socket.gaierror:
+    print ("ERROR Invalid URL Entered")
     sys.exit ("Exiting Program")
 
 # convert host IP number to integer
