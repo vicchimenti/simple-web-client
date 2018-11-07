@@ -34,14 +34,14 @@ match_all_IP = "0.0.0.0"    # for IP validity checking
 # get user input from command line
 try :
     user_input = sys.argv[1]
-except sys.IndexError as e :
-    print ("ERROR No Valid Command Line Input : " + e)
+except sys.IndexError :
+    print ("ERROR No Valid Command Line Input")
     sys.exit ("Exiting Program")
-except sys.KeyError as e :
-    print ("ERROR Invalid Charcter Entered : " + e)
+except sys.KeyError :
+    print ("ERROR Invalid Charcter Entered")
     sys.exit ("Exiting Program")
-except sys.Exception as e :
-    print ("ERROR Invalid Command Line Entry : " + e)
+except sys.Exception :
+    print ("ERROR Invalid Command Line Entry")
     sys.exit ("Exiting Program")
 
 
@@ -139,15 +139,15 @@ print ("host_ip_str : " + host_ip_str)
 # Set up a TCP/IP socket
 try :
     sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except sys.OSError as e :
-    print ("ERROR Creating Socket: " + e)
+except socket.OSError :
+    print ("ERROR Creating Socket")
     sys.exit ("Exiting Program")
 
 # Connect to the server as a client
 try :
     sock.connect ((host, port))
-except sys.OSError as e:
-    print ("ERROR Connecting" + e)
+except socket.OSError :
+    print ("ERROR Connecting")
     sys.exit ("Exiting Program")
 
 
@@ -173,11 +173,11 @@ except :
 try :
     sock.sendall (message.encode ('utf-8'))
     sock.shutdown(1)
-except sys.UnicodeError as e :
-    print ("Error Encoding Message : " + e)
+except socket.UnicodeError :
+    print ("Error Encoding Message")
     sys.exit ("Exiting Program")
-except socket.OSError as e :
-    print ("ERROR Sending Data : " + e)
+except socket.OSError :
+    print ("ERROR Sending Data")
     sys.exit ("Exiting Program")
 
 
@@ -194,8 +194,8 @@ pdf = ".pdf"
 # encode the delimiter to binary
 try :
     delim_in_bytes = endOf_header.encode ('utf-8')
-except sys.UnicodeError as e :
-    print ("ERROR Encoding Delimiter : " + e)
+except socket.UnicodeError :
+    print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
 
 # open file for input
@@ -220,11 +220,11 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
             response = sock.recv (4096)
             full_response += response.decode ('utf-8')
             if  not response : break
-    except sys.UnicodeError as e :
-        print ("ERROR Decoding Response : " + e)
+    except socket.UnicodeError :
+        print ("ERROR Decoding Response")
         sys.exit ("Exiting Program")
-    except socket.OSError as e :
-        print ("ERROR Receiving Response: " + e)
+    except socket.OSError :
+        print ("ERROR Receiving Response")
         sys.exit ("Exiting Program")
 
     # split the response into a header and a body
@@ -242,8 +242,8 @@ else :
             response = sock.recv (4096)
             byte_file.write (response)
             if  not response : break
-    except socket.OSError as e :
-        print ("ERROR Receiving Response: " + e)
+    except socket.OSError :
+        print ("ERROR Receiving Response: ")
         sys.exit ("Exiting Program")
 
     # split the response into header and body
@@ -254,8 +254,8 @@ else :
     # decode the header
     try :
         image_header = byte_header.decode ('utf-8')
-    except sys.UnicodeError as e :
-        print ("ERROR Decoding Image Header : " + e)
+    except socket.UnicodeError :
+        print ("ERROR Decoding Image Header")
         sys.exit ("Exiting Program")
 
     # add delimiter to header
