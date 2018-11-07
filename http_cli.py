@@ -169,7 +169,7 @@ except :
 
 
 
-
+# ***** TODO Send buf len or delim first ***** 
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
