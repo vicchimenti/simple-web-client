@@ -144,6 +144,7 @@ except OSError :
     sys.exit ("Exiting Program")
 
 # Connect to the server as a client
+sock.settimeout(5)
 try :
     sock.connect ((host, port))
 except OSError :
