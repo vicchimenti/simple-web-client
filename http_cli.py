@@ -2,12 +2,19 @@
 # CPSC 5510 FQ18
 # http_cli.py
 # v2.0
-# v2 includes updates for web server assignment
-# primary changes include better error handling
 # Created           10/19/2018
 # Last Modified     11/7/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
+
+
+
+
+# v2 includes updates for web server assignment
+# primary changes include better error handling
+# fixed command line parameters feedback
+# fixed URL handling feedback
+# fixed HTTP Request feedback
 
 
 
@@ -169,7 +176,7 @@ except :
 
 
 
-# ***** TODO Send buf len or delim first ***** 
+# ***** TODO Send buf len or delim first *****
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
