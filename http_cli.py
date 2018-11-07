@@ -57,13 +57,13 @@ else : protocol, full_URL = (user_input.split (double_slash , 2))
 
 
 
-# search for user provided port number
+# parse full URL for domain, path and port number
 x = full_URL.find (colon)
 
 # if there is a colon in the user input
 if x != -1 :
     # parse the host domain from the full URL
-    host, portPathway = (full_URL.split (colon, 2))
+    host, portPathway = (full_URL.split (colon , 2))
     # search for a path after the port number
     y = portPathway.find (single_slash)
 
@@ -83,6 +83,12 @@ else :
     x = full_URL.find (single_slash)
     host = full_URL[:x]
     path = full_URL[x:]
+
+# confirm that the path contains any value after first slash
+x = len(path)
+if x <= 1 :
+    path = ""
+
 
 
 
@@ -116,17 +122,15 @@ print ("host_ip_str : " + host_ip_str)
 # Set up a TCP/IP socket
 try :
     sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except socket.OSError as e :
+except sys.OSError as e :
     print ("ERROR Creating Socket: " + e)
     sys.exit ("Exiting Program")
 
-
 # Connect to the server as a client
-#sock.setblocking(False)
 try :
     sock.connect ((host, port))
-except OSError :
-    print ("ERROR Connecting")
+except sys.OSError as e:
+    print ("ERROR Connecting" + e)
     sys.exit ("Exiting Program")
 
 
