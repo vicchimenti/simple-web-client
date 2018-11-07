@@ -5,9 +5,9 @@
 # v2 includes updates for web server assignment
 # primary changes include better error handling
 # Created           10/19/2018
-# Last Modified     11/6/2018
+# Last Modified     11/7/2018
 # Simple Web Client in Python3
-# usr/bin/python3
+# /usr/local/python3/bin/python3
 
 
 
@@ -19,73 +19,96 @@ import sys              # io and error handling
 
 
 # set defaults
-port = 80
-path = ""
+port = 80                   # default port is 80 web server standard
+path = ""                   # declare path variable with empty string
+double_slash = "//"         # delimiter for parsing URLs
+single_slash = "/"          # delimiter for parsing URL paths
+colon = ":"                 # delimiter for parsing port numbers from URL
+endOf_header = "\r\n\r\n"   # delimiter for parsing header and body
+min_URL = 5                 # minimum length of an acceptable URL
+match_all_IP = "0.0.0.0"    # for IP validity checking
+
+
+
 
 # get user input from command line
 try :
     user_input = sys.argv[1]
-except sys.IndexError as e :
-    print ("ERROR No Valid Command Line Input : " + e)
+except IndexError :
+    print ("ERROR No Valid Command Line Input")
     sys.exit ("Exiting Program")
-except sys.KeyError as e :
-    print ("ERROR Invalid Command Line Entry : " + e)
+except KeyError :
+    print ("ERROR Invalid Charcter Entered")
+    sys.exit ("Exiting Program")
+except Exception :
+    print ("ERROR Invalid Command Line Entry")
     sys.exit ("Exiting Program")
 
 
 
 
 # parse user_input to expose full URL
-delim = "//"
-x = user_input.find (delim)
+x = user_input.find (double_slash)
 
 # if no http:// protocol was entered by the user
 if x == -1 : full_URL = user_input
 
 # if an http:// protocol was entered with the URL
-else : protocol, full_URL = (user_input.split (delim , 2))
+else : protocol, full_URL = (user_input.split (double_slash , 2))
+
+# validate full_URL
+x = len(full_URL)
+if x < 5 :
+    print ("ERROR Invalid URL Format")
+    sys.exit()
 
 
 
 
-# search for user provided port number
-delim = ":"
-x = full_URL.find (delim)
+
+# parse full URL for domain, path and port number
+x = full_URL.find (colon)
 
 # if there is a colon in the user input
 if x != -1 :
     # parse the host domain from the full URL
-    host, portPathway = (full_URL.split (delim, 2))
-    # now parse the port number from the path with a new delimiter
-    delim = "/"
-    y = portPathway.find (delim)
+    host, portPathway = (full_URL.split (colon , 2))
+    # search for a path after the port number
+    y = portPathway.find (single_slash)
 
     # if there is a path after the port number
     if y != -1 :
-        #portstr, path = (portPathway.split (delim, 2))
         portstr = portPathway[:y]
         path = portPathway[y:]
         port = int (portstr)
-        print ("Portstr : " + portstr)
-        #path = delim + path
+        print ("Portstr if : " + portstr)
         print ("Path if : " + path)
     else :
         port = int (portPathway)
 
-# if there is no colon in the user input
+# if there is no colon in the user input, then use default port
 else :
     # parse domain from path with new delimiter
-    delim = "/"
-    x = full_URL.find (delim)
-    host = full_URL[:x]
-    path = full_URL[x:]
+    x = full_URL.find (single_slash)
+    if x != -1 :
+        host = full_URL[:x]
+        path = full_URL[x:]
+    else :
+        host = full_URL
+        path = single_slash
+
+# confirm that the path contains any value after first slash
+x = len(path)
+if x <= 1 :
+    path = single_slash
 
 
 
-# TS OUTPUT
+
+# ***** TS OUTPUT ********
 print ("argument : " + sys.argv[1])
 print ("user_input : " + user_input)
-print ("portPathway : " + portPathway)
+#print ("portPathway : " + portPathway)
 print ("full_url : " + full_URL)
 print ("Path : " + path)
 print ("Host : " + host)
@@ -93,21 +116,35 @@ pseudoPort = str(port)
 print ("pseudoPort = " + pseudoPort)
 
 
-host_ip = socket.gethostbyname(host)
+
+
+# validate URL entered and assign host IP number
+try :
+    host_ip = socket.gethostbyname(host)
+except socket.gaierror:
+    print ("ERROR Invalid URL Entered")
+    sys.exit ("Exiting Program")
+
+# convert host IP number to integer
 host_ip_str = str(host_ip)
+if host_ip_str == match_all_IP :
+        print ("ERROR Invalid IP Number")
+        sys.exit ("Exiting Program")
+
 print ("host_ip_str : " + host_ip_str)
+
+
 
 
 # Set up a TCP/IP socket
 try :
     sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except socket.OSError as e :
-    print ("ERROR Creating Socket: " + e)
+except OSError :
+    print ("ERROR Creating Socket")
     sys.exit ("Exiting Program")
 
-
 # Connect to the server as a client
-#sock.setblocking(False)
+sock.settimeout(5)
 try :
     sock.connect ((host, port))
 except OSError :
@@ -121,7 +158,7 @@ except OSError :
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
-                  + "\r\n\r\n"
+                  + endOf_header
 
 # display GET Request
 try :
@@ -132,16 +169,16 @@ except :
 
 
 
-
+# ***** TODO Send buf len or delim first ***** 
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
     sock.shutdown(1)
-except sys.UnicodeError as e :
-    print ("Error Encoding Message : " + e)
+except UnicodeError :
+    print ("Error Encoding Message")
     sys.exit ("Exiting Program")
-except socket.OSError as e :
-    print ("ERROR Sending Data : " + e)
+except OSError :
+    print ("ERROR Sending Data")
     sys.exit ("Exiting Program")
 
 
@@ -150,17 +187,16 @@ except socket.OSError as e :
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
-delim = "\r\n\r\n"
-png = '.png'
-jpg = '.jpg'
-gif = '.gif'
-pdf = '.pdf'
+png = ".png"
+jpg = ".jpg"
+gif = ".gif"
+pdf = ".pdf"
 
 # encode the delimiter to binary
 try :
-    delim_in_bytes = delim.encode ('utf-8')
-except sys.UnicodeError as e :
-    print ("ERROR Encoding Delimiter : " + e)
+    delim_in_bytes = endOf_header.encode ('utf-8')
+except UnicodeError :
+    print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
 
 # open file for input
@@ -185,18 +221,15 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
             response = sock.recv (4096)
             full_response += response.decode ('utf-8')
             if  not response : break
-    except sys.UnicodeError as e :
-        print ("ERROR Decoding Response : " + e)
-        sys.exit ("Exiting Program")
-    except socket.OSError as e :
-        print ("ERROR Receiving Response: " + e)
+    except UnicodeError :
+        print ("ERROR Receiving Response")
         sys.exit ("Exiting Program")
 
     # split the response into a header and a body
     # *** TS TODO *** Search for Delimiter First before splitting
-    response_header, response_body = (full_response.split(delim, 2))
+    response_header, response_body = (full_response.split(endOf_header, 2))
     # re-add delimiter to header
-    response_header += delim
+    response_header += endOf_header
 
 else :
 
@@ -207,8 +240,8 @@ else :
             response = sock.recv (4096)
             byte_file.write (response)
             if  not response : break
-    except socket.OSError as e :
-        print ("ERROR Receiving Response: " + e)
+    except OSError :
+        print ("ERROR Receiving Response: ")
         sys.exit ("Exiting Program")
 
     # split the response into header and body
@@ -219,14 +252,15 @@ else :
     # decode the header
     try :
         image_header = byte_header.decode ('utf-8')
-    except sys.UnicodeError as e :
-        print ("ERROR Decoding Image Header : " + e)
+    except OSError :
+        print ("ERROR Decoding Image Header")
         sys.exit ("Exiting Program")
 
     # add delimiter to header
-    image_header += delim
+    image_header += endOf_header
 
-
+# Close the Connection
+sock.close()
 
 
 # process response, store data in variables and display results
@@ -269,7 +303,6 @@ else :
 
 
 
-# Close the connection
-sock.close()
+# Close the program
 sys.exit()
 # eof
