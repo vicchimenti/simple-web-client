@@ -25,6 +25,8 @@ double_slash = "//"         # delimiter for parsing URLs
 single_slash = "/"          # delimiter for parsing URL paths
 colon = ":"                 # delimiter for parsing port numbers from URL
 endOf_header = "\r\n\r\n"   # delimiter for parsing header and body
+min_URL = 5                 # minimum length of an acceptable URL
+match_all_IP = "0.0.0.0"    # for IP validity checking
 
 
 
@@ -39,8 +41,8 @@ except sys.KeyError as e :
     print ("ERROR Invalid Charcter Entered : " + e)
     sys.exit ("Exiting Program")
 except sys.Exception as e :
-        print ("ERROR Invalid Command Line Entry : " + e)
-        sys.exit ("Exiting Program")
+    print ("ERROR Invalid Command Line Entry : " + e)
+    sys.exit ("Exiting Program")
 
 
 
@@ -53,6 +55,13 @@ if x == -1 : full_URL = user_input
 
 # if an http:// protocol was entered with the URL
 else : protocol, full_URL = (user_input.split (double_slash , 2))
+
+# validate full_URL
+x = len(full_URL)
+if x < 5 :
+    print ("ERROR Invalid URL Format")
+    sys.exit()
+
 
 
 
@@ -118,6 +127,10 @@ except socket.gaierror:
 
 # convert host IP number to integer
 host_ip_str = str(host_ip)
+if host_ip_str == match_all_IP :
+        print ("ERROR Invalid IP Number")
+        sys.exit ("Exiting Program")
+
 print ("host_ip_str : " + host_ip_str)
 
 
