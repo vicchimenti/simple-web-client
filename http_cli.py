@@ -5,7 +5,7 @@
 # v2 includes updates for web server assignment
 # primary changes include better error handling
 # Created           10/19/2018
-# Last Modified     11/6/2018
+# Last Modified     11/7/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
 
@@ -36,8 +36,11 @@ except sys.IndexError as e :
     print ("ERROR No Valid Command Line Input : " + e)
     sys.exit ("Exiting Program")
 except sys.KeyError as e :
-    print ("ERROR Invalid Command Line Entry : " + e)
+    print ("ERROR Invalid Charcter Entered : " + e)
     sys.exit ("Exiting Program")
+except sys.Exception as e :
+        print ("ERROR Invalid Command Line Entry : " + e)
+        sys.exit ("Exiting Program")
 
 
 
@@ -94,9 +97,20 @@ pseudoPort = str(port)
 print ("pseudoPort = " + pseudoPort)
 
 
-host_ip = socket.gethostbyname(host)
+
+
+# validate URL entered and assign host IP number
+try :
+    host_ip = socket.gethostbyname(host)
+except : sys.OSError as e
+    print ("ERROR Invalid URL Entered : " + e)
+    sys.exit ("Exiting Program")
+
+# convert host IP number to integer
 host_ip_str = str(host_ip)
 print ("host_ip_str : " + host_ip_str)
+
+
 
 
 # Set up a TCP/IP socket
