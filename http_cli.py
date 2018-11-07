@@ -121,7 +121,7 @@ print ("pseudoPort = " + pseudoPort)
 # validate URL entered and assign host IP number
 try :
     host_ip = socket.gethostbyname(host)
-except gaierror:
+except socket.gaierror:
     print ("ERROR Invalid URL Entered")
     sys.exit ("Exiting Program")
 
