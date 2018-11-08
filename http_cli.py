@@ -208,22 +208,6 @@ except UnicodeError :
 
 
 
-# declare parsing variables and scrub for non-HTML/txt file type
-full_response = "\n"
-png = ".png"
-jpg = ".jpg"
-gif = ".gif"
-pdf = ".pdf"
-
-# scan path for file type
-x = path.find (png)
-xy = path.find (jpg)
-xyz = path.find (gif)
-xyzz = path.find (pdf)
-
-
-
-
 # receive message back from server in byte stream
 binary_message = bytearray()
 try :
@@ -304,6 +288,15 @@ if message_type != empty_message :
             tb = sys.exc_info()
             print ("ERROR Writing Image Response Body : " + tb)
             sys.exit ("Exiting Program")
+
+else :
+            # if empty response body
+            try :
+                sys.stderr.write (response_header)
+            except sys.Exception as tb :
+                tb = sys.exc_info()
+                print ("ERROR Writing Response Header : " + tb)
+                sys.exit ("Exiting Program")
 
 
 
