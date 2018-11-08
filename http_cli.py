@@ -3,7 +3,7 @@
 # http_cli.py
 # v2.0
 # Created           10/19/2018
-# Last Modified     11/7/2018
+# Last Modified     11/8/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
 
@@ -26,14 +26,16 @@ import sys              # io and error handling
 
 
 # set defaults
-port = 80                   # default port is 80 web server standard
-path = ""                   # declare path variable with empty string
-double_slash = "//"         # delimiter for parsing URLs
-single_slash = "/"          # delimiter for parsing URL paths
-colon = ":"                 # delimiter for parsing port numbers from URL
-endOf_header = "\r\n\r\n"   # delimiter for parsing header and body
-min_URL = 5                 # minimum length of an acceptable URL
-match_all_IP = "0.0.0.0"    # for IP validity checking
+port = 80                           # default port is 80 web server standard
+path = ""                           # declare path variable with empty string
+double_slash = "//"                 # delimiter for parsing URLs
+single_slash = "/"                  # delimiter for parsing URL paths
+colon = ":"                         # delimiter for parsing port from URL
+endOf_header = "\r\n\r\n"           # delimiter for parsing header and body
+min_URL = 5                         # minimum length of an acceptable URL
+match_all_IP = "0.0.0.0"            # for IP validity checking
+content_length = "Content-Length:"  # delimiter to find buffer length
+buffer_length = None                # default buffer length
 
 
 
@@ -228,9 +230,19 @@ if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
             response = sock.recv (4096)
             full_response += response.decode ('utf-8')
             if  not response : break
+            if buffer_length is None :
+                x = full_response.find(colon)
+                if x != -1 :
+                    buffer_length_str, ignored, full_response = full_response.partition(colon)
+                    buffer_length = int (buffer_length_str)
+            if len(full_response) < buffer_length : break
+
+
     except UnicodeError :
         print ("ERROR Receiving Response")
         sys.exit ("Exiting Program")
+
+
 
     # split the response into a header and a body
     # *** TS TODO *** Search for Delimiter First before splitting
