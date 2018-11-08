@@ -194,7 +194,6 @@ except OSError :
 
 
 
-sys.exit()
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
