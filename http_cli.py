@@ -35,7 +35,8 @@ endOf_header = "\r\n\r\n"           # delimiter for parsing header and body
 min_URL = 5                         # minimum length of an acceptable URL
 match_all_IP = "0.0.0.0"            # for IP validity checking
 content_length = "Content-Length:"  # delimiter to find buffer length
-buffer_length = None                # default buffer length
+buffer_length = 0                   # default buffer length
+buffer_length_str = ""
 
 
 
@@ -161,13 +162,14 @@ except OSError :
     sys.exit ("Exiting Program")
 
 
-
-
 # prepare message for server
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
                   + endOf_header
+
+
+
 
 # display GET Request
 try :
@@ -192,7 +194,7 @@ except OSError :
 
 
 
-
+sys.exit()
 
 # declare parsing variables and scrub for non-HTML/txt file type
 full_response = "\n"
