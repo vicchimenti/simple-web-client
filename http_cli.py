@@ -31,12 +31,15 @@ path = ""                           # declare path variable with empty string
 double_slash = "//"                 # delimiter for parsing URLs
 single_slash = "/"                  # delimiter for parsing URL paths
 colon = ":"                         # delimiter for parsing port from URL
+semi_colon = ";"                    # delimiter for parsing data from header
 endOf_header = "\r\n\r\n"           # delimiter for parsing header and body
 min_URL = 5                         # minimum length of an acceptable URL
 match_all_IP = "0.0.0.0"            # for IP validity checking
-content_length = "Content-Length:"  # delimiter to find buffer length
+content_type = "Content-Type:"       # delimiter to find content type
+content_length = "Content-Length:"   # delimiter to find buffer length
 buffer_length = 0                   # default buffer length
-buffer_length_str = ""
+
+
 
 
 
@@ -162,7 +165,7 @@ except OSError :
     sys.exit ("Exiting Program")
 
 
-# prepare message for server
+# prepare message for server with delimiter included
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
@@ -180,7 +183,7 @@ except :
 
 
 
-# ***** TODO Send buf len or delim first *****
+
 # send message to the web server
 try :
     sock.sendall (message.encode ('utf-8'))
@@ -195,13 +198,6 @@ except OSError :
 
 
 
-# declare parsing variables and scrub for non-HTML/txt file type
-full_response = "\n"
-png = ".png"
-jpg = ".jpg"
-gif = ".gif"
-pdf = ".pdf"
-
 # encode the delimiter to binary
 try :
     delim_in_bytes = endOf_header.encode ('utf-8')
@@ -209,8 +205,15 @@ except UnicodeError :
     print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
 
-# open file for input
-byte_file = open ('tempFile.txt', 'wb')
+
+
+
+# declare parsing variables and scrub for non-HTML/txt file type
+full_response = "\n"
+png = ".png"
+jpg = ".jpg"
+gif = ".gif"
+pdf = ".pdf"
 
 # scan path for file type
 x = path.find (png)
@@ -221,104 +224,86 @@ xyzz = path.find (pdf)
 
 
 
-# receive response from server and check for file type
-if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+# receive message back from server in byte stream
+binary_message = bytearray()
+try :
+    while True :
+        response = sock.recv (4096)
+        binary_message += response
+        if  not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
+    sys.exit ("Exiting Program")
 
-    # receive message from server and decode from bytes
-    try :
-        while True :
-            # not an image file type
-            response = sock.recv (4096)
-            full_response += response.decode ('utf-8')
-            if  not response : break
-            if buffer_length is None :
-                x = full_response.find(colon)
-                if x != -1 :
-                    buffer_length_str, ignored, full_response = full_response.partition(colon)
-                    buffer_length = int (buffer_length_str)
-            if len(full_response) < buffer_length : break
+# split the response into header and body
+binary_header, binary_body = (binary_message.split(delim_in_bytes, 2))
 
+# decode the header
+try :
+    response_header = binary_header.decode ('utf-8')
+except OSError :
+    print ("ERROR Decoding Image Header")
+    sys.exit ("Exiting Program")
 
-    except UnicodeError :
-        print ("ERROR Receiving Response")
-        sys.exit ("Exiting Program")
+# add delimiter to header
+response_header += endOf_header
 
-
-
-    # split the response into a header and a body
-    # *** TS TODO *** Search for Delimiter First before splitting
-    response_header, response_body = (full_response.split(endOf_header, 2))
-    # re-add delimiter to header
-    response_header += endOf_header
-
-else :
-
-    # receive message back from server in byte stream
-    try :
-        while True :
-            # image file type
-            response = sock.recv (4096)
-            byte_file.write (response)
-            if  not response : break
-    except OSError :
-        print ("ERROR Receiving Response: ")
-        sys.exit ("Exiting Program")
-
-    # split the response into header and body
-    with open ('tempFile.txt', 'rb') as f:
-        data = f.read()
-    byte_header, image_body = (data.split(delim_in_bytes, 2))
-
-    # decode the header
-    try :
-        image_header = byte_header.decode ('utf-8')
-    except OSError :
-        print ("ERROR Decoding Image Header")
-        sys.exit ("Exiting Program")
-
-    # add delimiter to header
-    image_header += endOf_header
-
-# Close the Connection
+# Close the Socket
 sock.close()
 
 
+
+
+# parse header for content type
+empty_message = "empty"
+message_type = empty_message
+x = response_header.find(content_type)
+if x != -1 :
+    ignore_field, ignore_type, message_type  = response_header.partition(content_type)
+    message_type, ignore_semi_colon, ignore_field = message_type.partition(semi_colon)
+
+
+
+
 # process response, store data in variables and display results
-if x == -1 and xy == -1 and  xyz == -1 and xyzz == -1 :
+if message_type != empty_message :
+    x = message_type.find("text")
 
-    # if not an image file
-    try :
-        sys.stderr.write (response_header)
-    except sys.Exception as tb :
-        tb = sys.exc_info()
-        print ("ERROR Writing Response Header : " + tb)
-        sys.exit ("Exiting Program")
+    if x != -1 :
+        # if not an image file
+        try :
+            sys.stderr.write (response_header)
+        except sys.Exception as tb :
+            tb = sys.exc_info()
+            print ("ERROR Writing Response Header : " + tb)
+            sys.exit ("Exiting Program")
 
-    # print message body
-    try :
-        sys.stdout.write (response_body)
-    except sys.Exception as tb :
-        tb = sys.exc_info()
-        print ("ERROR Writing Response Body : " + tb)
-        sys.exit ("Exiting Program")
+        # print message body
+        try :
+            response_body = binary_body.decode('utf-8')
+            sys.stdout.write (response_body)
+        except sys.Exception as tb :
+            tb = sys.exc_info()
+            print ("ERROR Writing Response Body : " + tb)
+            sys.exit ("Exiting Program")
 
-else :
+    else :
 
-    # if image file
-    try :
-        sys.stderr.write (image_header)
-    except sys.Exception as tb :
-        tb = sys.exc_info()
-        print ("ERROR Writing Image Response Header: " + tb)
-        sys.exit ("Exiting Program")
+        # if image file
+        try :
+            sys.stderr.write (response_header)
+        except sys.Exception as tb :
+            tb = sys.exc_info()
+            print ("ERROR Writing Image Response Header: " + tb)
+            sys.exit ("Exiting Program")
 
-    # print message body
-    try :
-        sys.stdout.buffer.write (image_body)
-    except sys.Exception as tb :
-        tb = sys.exc_info()
-        print ("ERROR Writing Image Response Body : " + tb)
-        sys.exit ("Exiting Program")
+        # print message body
+        try :
+            sys.stdout.buffer.write (binary_body)
+        except sys.Exception as tb :
+            tb = sys.exc_info()
+            print ("ERROR Writing Image Response Body : " + tb)
+            sys.exit ("Exiting Program")
 
 
 
