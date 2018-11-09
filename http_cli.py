@@ -39,6 +39,7 @@ charset = "UTF-8"                       # default encoding protocol
 # set constants
 DOUBLE_SLASH = "//"                     # delimiter for parsing URLs
 SINGLE_SLASH = "/"                      # delimiter for parsing URL paths
+NEW_LINE = "\r\n"
 COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
@@ -275,19 +276,18 @@ if x != -1 :
             message_type.partition(SEMI_COLON)
         char_field, charset, ignore_field = \
             char_field.partition(CHARSET_FIELD)
+        charset, ignore, ignore_field = \
+            charset.partition(NEW_LINE)
     except EXCEPTION :
         print ("ERROR Parsing Header")
         sys.exit ("Exiting Program")
-else :
-    raise EXCEPTION :
-        print ("ERROR Invalid Header")
-        sys.exit ("Exiting Program")
 
+print ("charset : " + charset)
 
 
 
 # process response, store data in variables and display results
-if message_type != empty_message :
+if message_type != EMPTY_MESSAGE :
 
     # confirm that non-text is an text/html type
     x = message_type.find(TEXT)
@@ -310,10 +310,7 @@ if message_type != empty_message :
             except Exception :
                 print ("ERROR Writing Image Response Body")
                 sys.exit ("Exiting Program")
-        else :
-            raise EXCEPTION :
-                print ("ERROR Invalid Content-Type")
-                sys.exit ("Exiting Program")
+
 
 
 
