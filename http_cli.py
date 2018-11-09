@@ -15,6 +15,7 @@
 # fixed command line parameters feedback
 # fixed URL handling feedback
 # fixed HTTP Request feedback
+# fixed image parsing algorithm
 
 
 
