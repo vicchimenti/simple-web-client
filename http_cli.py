@@ -274,7 +274,7 @@ if x != -1 :
             response_header.partition(CONTENT_TYPE)
         message_type, ignore_SEMI_COLON, char_field = \
             message_type.partition(SEMI_COLON)
-        char_field, charset, ignore_field = \
+        ignore_field, char_field, charset = \
             char_field.partition(CHARSET_FIELD)
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
