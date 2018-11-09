@@ -227,6 +227,11 @@ except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
 
+buffer_length_str = binary_message.decode (charset)
+buffer_length = int(buffer_length_str)
+print ("buffer_length_str : " + buffer_length_str)
+
+
 # split the response into header and body
 binary_header, binary_body = (binary_message.split(delim_in_bytes, 2))
 
@@ -252,7 +257,7 @@ try :
 except Exception :
     print ("ERROR Writing Response Header")
     sys.exit ("Exiting Program")
-
+sys.exit()
 
 
 
@@ -270,12 +275,16 @@ char_field = EMPTY_MESSAGE
 x = response_header.find(CONTENT_TYPE)
 if x != -1 :
     try :
+        # parse response header for content type field
         ignore_field, ignore_type, message_type  = \
             response_header.partition(CONTENT_TYPE)
+        # parse content type field for the type
         message_type, ignore_SEMI_COLON, char_field = \
             message_type.partition(SEMI_COLON)
+        # parse the remainder for the charset field
         ignore_field, char_field, charset = \
             char_field.partition(CHARSET_FIELD)
+        # parse the charset field for the value
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
     except EXCEPTION :
