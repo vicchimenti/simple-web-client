@@ -43,8 +43,7 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
-CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
-CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+
 
 
 
@@ -246,72 +245,75 @@ sock.close()
 
 
 
-# parse header for content type
-empty_message = "empty"
-message_type = empty_message
+# print the Header
+try :
+    sys.stderr.write (response_header)
+except Exception :
+    print ("ERROR Writing Response Header")
+    sys.exit ("Exiting Program")
+
+
+
+
+# declare variables for to parse header content
+CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
+CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
+EMPTY_MESSAGE = "empty"
+message_type = EMPTY_MESSAGE
+char_field = EMPTY_MESSAGE
+
+# parse header for content type
 x = response_header.find(CONTENT_TYPE)
 if x != -1 :
-    ignore_field, ignore_type, message_type  = \
-        response_header.partition(CONTENT_TYPE)
-    message_type, ignore_SEMI_COLON, ignore_field = \
-        message_type.partition(SEMI_COLON)
+    try :
+        ignore_field, ignore_type, message_type  = \
+            response_header.partition(CONTENT_TYPE)
+        message_type, ignore_SEMI_COLON, char_field = \
+            message_type.partition(SEMI_COLON)
+        char_field, charset, ignore_field = \
+            char_field.partition(CHARSET_FIELD)
+    except EXCEPTION :
+        print ("ERROR Parsing Header")
+        sys.exit ("Exiting Program")
+else :
+    raise EXCEPTION :
+        print ("ERROR Invalid Header")
+        sys.exit ("Exiting Program")
 
 
 
 
 # process response, store data in variables and display results
 if message_type != empty_message :
+
+    # confirm that non-text is an text/html type
     x = message_type.find(TEXT)
-
     if x != -1 :
-        # if page content in text/html
-        try :
-            sys.stderr.write (response_header)
-        except sys.Exception as tb :
-            tb = sys.exc_info()
-            print ("ERROR Writing Response Header : " + tb)
-            sys.exit ("Exiting Program")
-
         # print message body
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
-        except sys.Exception as tb :
-            tb = sys.exc_info()
-            print ("ERROR Writing Response Body : " + tb)
+        except Exception :
+            print ("ERROR Writing Response Body")
             sys.exit ("Exiting Program")
 
-
-    # confirm that non-text is an image type
-    x = message_type.find(IMAGE)
-    if x != -1 :
-
-        # if image file
-        try :
-            sys.stderr.write (response_header)
-        except sys.Exception as tb :
-            tb = sys.exc_info()
-            print ("ERROR Writing Image Response Header: " + tb)
-            sys.exit ("Exiting Program")
-
-        # print message body
-        try :
-            sys.stdout.buffer.write (binary_body)
-        except sys.Exception as tb :
-            tb = sys.exc_info()
-            print ("ERROR Writing Image Response Body : " + tb)
-            sys.exit ("Exiting Program")
-
-else :
-    # if empty response body
-    try :
-        sys.stderr.write (response_header)
-    except sys.Exception as tb :
-        tb = sys.exc_info()
-        print ("ERROR Writing Response Header : " + tb)
-        sys.exit ("Exiting Program")
+    else :
+        # confirm that non-text is an image type
+        x = message_type.find(IMAGE)
+        if x != -1 :
+            # print message body
+            try :
+                sys.stdout.buffer.write (binary_body)
+            except Exception :
+                print ("ERROR Writing Image Response Body")
+                sys.exit ("Exiting Program")
+        else :
+            raise EXCEPTION :
+                print ("ERROR Invalid Content-Type")
+                sys.exit ("Exiting Program")
 
 
 
