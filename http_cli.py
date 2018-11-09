@@ -27,18 +27,25 @@ import sys              # io and error handling
 
 
 # set defaults
-port = 80                           # default port is 80 web server standard
-path = ""                           # declare path variable with empty string
-double_slash = "//"                 # delimiter for parsing URLs
-single_slash = "/"                  # delimiter for parsing URL paths
-colon = ":"                         # delimiter for parsing port from URL
-semi_colon = ";"                    # delimiter for parsing data from header
-endOf_header = "\r\n\r\n"           # delimiter for parsing header and body
-min_URL = 5                         # minimum length of an acceptable URL
-match_all_IP = "0.0.0.0"            # for IP validity checking
-content_type = "Content-Type:"       # delimiter to find content type
-content_length = "Content-Length:"   # delimiter to find buffer length
-buffer_length = 0                   # default buffer length
+port = 80                               # default port is 80 web server standard
+path = ""                               # declare path with empty string
+min_URL = 5                             # minimum length of an acceptable URL
+buffer_length = 0                       # default buffer length
+charset = "UTF-8"                       # default encoding protocol
+
+
+
+
+# set constants
+DOUBLE_SLASH = "//"                     # delimiter for parsing URLs
+SINGLE_SLASH = "/"                      # delimiter for parsing URL paths
+COLON = ":"                             # delimiter for parsing port from URL
+SEMI_COLON = ";"                        # delimiter for parsing data from header
+END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
+MATCH_ALL = "0.0.0.0"                   # for IP validity checking
+CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
+CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+
 
 
 
@@ -62,13 +69,13 @@ except Exception :
 
 
 # parse user_input to expose full URL
-x = user_input.find (double_slash)
+x = user_input.find (DOUBLE_SLASH)
 
 # if no http:// protocol was entered by the user
 if x == -1 : full_URL = user_input
 
 # if an http:// protocol was entered with the URL
-else : protocol, full_URL = (user_input.split (double_slash , 2))
+else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
 
 # validate full_URL
 x = len(full_URL)
@@ -81,14 +88,14 @@ if x < 5 :
 
 
 # parse full URL for domain, path and port number
-x = full_URL.find (colon)
+x = full_URL.find (COLON)
 
-# if there is a colon in the user input
+# if there is a COLON in the user input
 if x != -1 :
     # parse the host domain from the full URL
-    host, portPathway = (full_URL.split (colon , 2))
+    host, portPathway = (full_URL.split (COLON , 2))
     # search for a path after the port number
-    y = portPathway.find (single_slash)
+    y = portPathway.find (SINGLE_SLASH)
 
     # if there is a path after the port number
     if y != -1 :
@@ -100,21 +107,21 @@ if x != -1 :
     else :
         port = int (portPathway)
 
-# if there is no colon in the user input, then use default port
+# if there is no COLON in the user input, then use default port
 else :
     # parse domain from path with new delimiter
-    x = full_URL.find (single_slash)
+    x = full_URL.find (SINGLE_SLASH)
     if x != -1 :
         host = full_URL[:x]
         path = full_URL[x:]
     else :
         host = full_URL
-        path = single_slash
+        path = SINGLE_SLASH
 
 # confirm that the path contains any value after first slash
 x = len(path)
 if x <= 1 :
-    path = single_slash
+    path = SINGLE_SLASH
 
 
 
@@ -141,7 +148,7 @@ except socket.gaierror:
 
 # convert host IP number to integer
 host_ip_str = str(host_ip)
-if host_ip_str == match_all_IP :
+if host_ip_str == MATCH_ALL :
         print ("ERROR Invalid IP Number")
         sys.exit ("Exiting Program")
 
@@ -170,7 +177,7 @@ except OSError :
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
-                  + endOf_header
+                  + END_HEADER
 
 
 
@@ -187,7 +194,7 @@ except :
 
 # send message to the web server
 try :
-    sock.sendall (message.encode ('utf-8'))
+    sock.sendall (message.encode (charset))
     sock.shutdown(1)
 except UnicodeError :
     print ("Error Encoding Message")
@@ -201,7 +208,7 @@ except OSError :
 
 # encode the delimiter to binary
 try :
-    delim_in_bytes = endOf_header.encode ('utf-8')
+    delim_in_bytes = END_HEADER.encode (charset)
 except UnicodeError :
     print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
@@ -225,13 +232,13 @@ binary_header, binary_body = (binary_message.split(delim_in_bytes, 2))
 
 # decode the header
 try :
-    response_header = binary_header.decode ('utf-8')
+    response_header = binary_header.decode (charset)
 except OSError :
     print ("ERROR Decoding Image Header")
     sys.exit ("Exiting Program")
 
 # add delimiter to header
-response_header += endOf_header
+response_header += END_HEADER
 
 # Close the Socket
 sock.close()
@@ -242,20 +249,24 @@ sock.close()
 # parse header for content type
 empty_message = "empty"
 message_type = empty_message
-x = response_header.find(content_type)
+TEXT = "text"
+IMAGE = "image"
+x = response_header.find(CONTENT_TYPE)
 if x != -1 :
-    ignore_field, ignore_type, message_type  = response_header.partition(content_type)
-    message_type, ignore_semi_colon, ignore_field = message_type.partition(semi_colon)
+    ignore_field, ignore_type, message_type  = \
+        response_header.partition(CONTENT_TYPE)
+    message_type, ignore_SEMI_COLON, ignore_field = \
+        message_type.partition(SEMI_COLON)
 
 
 
 
 # process response, store data in variables and display results
 if message_type != empty_message :
-    x = message_type.find("text")
+    x = message_type.find(TEXT)
 
     if x != -1 :
-        # if not an image file
+        # if page content in text/html
         try :
             sys.stderr.write (response_header)
         except sys.Exception as tb :
@@ -265,14 +276,17 @@ if message_type != empty_message :
 
         # print message body
         try :
-            response_body = binary_body.decode('utf-8')
+            response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
         except sys.Exception as tb :
             tb = sys.exc_info()
             print ("ERROR Writing Response Body : " + tb)
             sys.exit ("Exiting Program")
 
-    else :
+
+    # confirm that non-text is an image type
+    x = message_type.find(IMAGE)
+    if x != -1 :
 
         # if image file
         try :
@@ -291,13 +305,13 @@ if message_type != empty_message :
             sys.exit ("Exiting Program")
 
 else :
-            # if empty response body
-            try :
-                sys.stderr.write (response_header)
-            except sys.Exception as tb :
-                tb = sys.exc_info()
-                print ("ERROR Writing Response Header : " + tb)
-                sys.exit ("Exiting Program")
+    # if empty response body
+    try :
+        sys.stderr.write (response_header)
+    except sys.Exception as tb :
+        tb = sys.exc_info()
+        print ("ERROR Writing Response Header : " + tb)
+        sys.exit ("Exiting Program")
 
 
 
