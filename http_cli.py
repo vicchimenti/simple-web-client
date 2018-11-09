@@ -224,6 +224,7 @@ try :
         binary_message += response
         x = binary_message.find(response_delim_in_bytes)
         if x != -1 : break
+        if not response : break
 except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
