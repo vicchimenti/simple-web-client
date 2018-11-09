@@ -228,9 +228,9 @@ except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
 
-buffer_length_str = binary_message.decode (charset)
-buffer_length = int(buffer_length_str)
-print ("buffer_length_str : " + buffer_length_str)
+#buffer_length_str = binary_message.decode (charset)
+#buffer_length = int(buffer_length_str)
+#print ("buffer_length_str : " + buffer_length_str)
 
 # encode the Header delimiter to binary
 try :
@@ -240,7 +240,11 @@ except UnicodeError :
     sys.exit ("Exiting Program")
 
 # split the response into header and body
-binary_header, binary_body = (binary_message.split(delim_in_bytes, 2))
+try :
+    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
+except ValueError :
+    print ("ERROR Parsing Response")
+    sys.exit ("Exiting Program")
 
 # decode the header
 try :
