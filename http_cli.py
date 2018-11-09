@@ -43,6 +43,7 @@ NEW_LINE = "\r\n"
 COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
+END_RESPONSE = "\r\n\t\r\n\t"
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
@@ -206,13 +207,12 @@ except OSError :
 
 
 
-# encode the delimiter to binary
+# encode the Response delimiter to binary
 try :
-    delim_in_bytes = END_HEADER.encode (charset)
+    response_delim_in_bytes = END_RESPONSE.encode (charset)
 except UnicodeError :
     print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
-
 
 
 
@@ -222,7 +222,8 @@ try :
     while True :
         response = sock.recv (4096)
         binary_message += response
-        if  not response : break
+        x = binary_message.find(response_delim_in_bytes)
+        if x != -1 : break
 except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
@@ -231,6 +232,12 @@ buffer_length_str = binary_message.decode (charset)
 buffer_length = int(buffer_length_str)
 print ("buffer_length_str : " + buffer_length_str)
 
+# encode the Header delimiter to binary
+try :
+    header_delim_in_bytes = END_HEADER.encode (charset)
+except UnicodeError :
+    print ("ERROR Encoding Delimiter")
+    sys.exit ("Exiting Program")
 
 # split the response into header and body
 binary_header, binary_body = (binary_message.split(delim_in_bytes, 2))
