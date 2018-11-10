@@ -39,11 +39,11 @@ charset = "UTF-8"                       # default encoding protocol
 # set constants
 DOUBLE_SLASH = "//"                     # delimiter for parsing URLs
 SINGLE_SLASH = "/"                      # delimiter for parsing URL paths
-NEW_LINE = "\r\n"
 COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
+NEW_LINE = "\r\n"                       # delimiter for new line return
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
-END_RESPONSE = "\r\n\t\r\n\t"
+END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
@@ -77,9 +77,8 @@ else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
 # validate full_URL
 x = len(full_URL)
 if x < 5 :
-    print ("ERROR Invalid URL Format")
+    sys.stderr.write ("ERROR Invalid URL Format")
     sys.exit()
-
 
 
 
@@ -164,9 +163,9 @@ message = "GET "  + path \
 # display GET Request
 try :
     sys.stderr.write (message)
-except :
-    tb = sys.exc_info()
-    print ("ERROR Standard Error Write : " + tb)
+except Exception :
+    print ("ERROR Standard Error Write ")
+    sys.exit("Exiting Program")
 
 
 
@@ -286,7 +285,7 @@ if sc != -1 :
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
     else :
-        print ("ERROR Parsing Header")
+        sys.stderr.write ("ERROR Parsing Header")
         sys.exit ("Exiting Program")
 
 
@@ -311,7 +310,7 @@ if sc != -1 :
             sys.exit ("Exiting Program")
 
     else :
-        print ("ERROR Invalid Content-Type")
+        sys.stderr.write ("ERROR Invalid Content-Type")
         sys.exit ("Exiting Program")
 
 
