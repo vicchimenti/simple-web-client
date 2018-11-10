@@ -322,7 +322,7 @@ if sc != -1 :
 
 
 
-if sc != -1
+if sc != -1 :
     # determine content type and print the message body
     x = message_type.find(TEXT)
     y = message_type.find(IMAGE)
