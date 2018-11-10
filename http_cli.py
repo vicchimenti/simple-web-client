@@ -53,13 +53,13 @@ MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 try :
     user_input = sys.argv[1]
 except IndexError :
-    sys.stderr.write ("ERROR No Valid Command Line Input")
+    sys.stderr.write ("ERROR No Valid Command Line Input : ")
     sys.exit ("Exiting Program")
 except KeyError :
-    sys.stderr.write ("ERROR Invalid Charcter Entered")
+    sys.stderr.write ("ERROR Invalid Charcter Entered : ")
     sys.exit ("Exiting Program")
 except Exception :
-    sys.stderr.write ("ERROR Invalid Command Line Entry")
+    sys.stderr.write ("ERROR Invalid Command Line Entry : ")
     sys.exit ("Exiting Program")
 
 
@@ -77,8 +77,8 @@ else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
 # validate full_URL
 x = len(full_URL)
 if x < 5 :
-    sys.stderr.write ("ERROR Invalid URL Format")
-    sys.exit()
+    sys.stderr.write ("ERROR Invalid URL Format : ")
+    sys.exit("Exiting Program")
 
 
 
@@ -124,13 +124,13 @@ if x <= 1 :
 try :
     host_ip = socket.gethostbyname(host)
 except socket.gaierror:
-    sys.stderr.write ("ERROR Invalid URL Entered")
+    sys.stderr.write ("ERROR Invalid URL Entered : ")
     sys.exit ("Exiting Program")
 
 # convert host IP number to integer
 host_ip_str = str(host_ip)
 if host_ip_str == MATCH_ALL :
-        sys.stderr.write ("ERROR Invalid IP Number")
+        sys.stderr.write ("ERROR Invalid IP Number : ")
         sys.exit ("Exiting Program")
 
 
@@ -140,15 +140,15 @@ if host_ip_str == MATCH_ALL :
 try :
     sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
 except OSError :
-    sys.stderr.write ("ERROR Creating Socket")
+    sys.stderr.write ("ERROR Creating Socket : ")
     sys.exit ("Exiting Program")
 
 # Connect to the server as a client
-sock.settimeout(5)
+sock.settimeout(10)
 try :
     sock.connect ((host, port))
 except OSError :
-    sys.stderr.write ("ERROR Connecting")
+    sys.stderr.write ("ERROR Connecting : ")
     sys.exit ("Exiting Program")
 
 
@@ -164,7 +164,7 @@ message = "GET "  + path \
 try :
     sys.stderr.write (message)
 except Exception :
-    sys.stderr.write ("ERROR Standard Error Write ")
+    sys.stderr.write ("ERROR Standard Error Write : ")
     sys.exit("Exiting Program")
 
 
@@ -175,10 +175,10 @@ try :
     sock.sendall (message.encode (charset))
     sock.shutdown(1)
 except UnicodeError :
-    sys.stderr.write ("Error Encoding Message")
+    sys.stderr.write ("Error Encoding Message : ")
     sys.exit ("Exiting Program")
 except OSError :
-    sys.stderr.write ("ERROR Sending Data")
+    sys.stderr.write ("ERROR Sending Data : ")
     sys.exit ("Exiting Program")
 
 
@@ -188,7 +188,7 @@ except OSError :
 try :
     response_delim_in_bytes = END_RESPONSE.encode (charset)
 except UnicodeError :
-    sys.stderr.write ("ERROR Encoding Delimiter")
+    sys.stderr.write ("ERROR Encoding Delimiter : ")
     sys.exit ("Exiting Program")
 
 
@@ -198,7 +198,7 @@ except UnicodeError :
 try :
     header_delim_in_bytes = END_HEADER.encode (charset)
 except UnicodeError :
-    sys.stderr.write ("ERROR Encoding Delimiter")
+    sys.stderr.write ("ERROR Encoding Delimiter : ")
     sys.exit ("Exiting Program")
 
 
@@ -213,7 +213,7 @@ try :
         binary_message += response
         if not response : break
 except OSError :
-    sys.stderr.write ("ERROR Receiving Response: ")
+    sys.stderr.write ("ERROR Receiving Response : ")
     sys.exit ("Exiting Program")
 
 # Close the Socket
@@ -223,8 +223,8 @@ sock.close()
 
 
 # split the data into header and body
-#binary_body = bytearray()
-#binary_header = bytearray()
+binary_body = bytearray()
+binary_header = bytearray()
 binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 
 
@@ -234,7 +234,7 @@ binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 try :
     response_header = binary_header.decode (charset)
 except OSError :
-    sys.stderr.write ("ERROR Decoding Image Header")
+    sys.stderr.write ("ERROR Decoding Image Header : ")
     sys.exit ("Exiting Program")
 # add delimiter
 response_header += END_HEADER
@@ -245,7 +245,7 @@ response_header += END_HEADER
 try :
     sys.stderr.write (response_header)
 except Exception :
-    sys.stderr.write ("ERROR Writing Response Header")
+    sys.stderr.write ("ERROR Writing Response Header : ")
     sys.exit ("Exiting Program")
 
 
@@ -285,7 +285,7 @@ if sc != -1 :
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
     else :
-        sys.stderr.write ("ERROR Parsing Header")
+        sys.stderr.write ("ERROR Parsing Header : ")
         sys.exit ("Exiting Program")
 
 
@@ -297,20 +297,22 @@ if sc != -1 :
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
+            sys.stderr.write ("")
         except Exception :
-            sys.stderr.write ("ERROR Writing Text Response Body")
+            sys.stderr.write ("ERROR Writing Text Response Body : ")
             sys.exit ("Exiting Program")
 
     elif z != -1 :
         # print image message body
         try :
             sys.stdout.buffer.write (binary_body)
+            sys.stderr.write ("")
         except Exception :
-            sys.stderr.write ("ERROR Writing Image Response Body")
+            sys.stderr.write ("ERROR Writing Image Response Body : ")
             sys.exit ("Exiting Program")
 
     else :
-        sys.stderr.write ("ERROR Invalid Content-Type")
+        sys.stderr.write ("ERROR Invalid Content-Type : ")
         sys.exit ("Exiting Program")
 
 
