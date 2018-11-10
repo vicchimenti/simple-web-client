@@ -349,7 +349,15 @@ if sc != -1 :
     else :
         print ("ERROR Invalid Content-Type")
         sys.exit ("Exiting Program")
-
+else :
+    # Status Code is not 200 OK
+    try :
+        response_body = binary_body.decode(charset)
+        sys.stdout.write (response_body)
+        print ("response_body : " + response_body)
+    except Exception :
+        print ("ERROR Writing Response Body : Status Code not 200 OK")
+        sys.exit ("Exiting Program")
 
 
 
