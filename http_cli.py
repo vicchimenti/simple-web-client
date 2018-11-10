@@ -243,6 +243,9 @@ except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
 
+
+
+
 # decode the header
 try :
     response_header = binary_header.decode (charset)
@@ -262,33 +265,30 @@ CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
 
 # scan header for Content-Length
 x = response_header.find(CONTENT_LENGTH)
-
+# acquire receive size
 if x != -1 :
     ignore, length_field = response_header.split(CONTENT_LENGTH, 2)
-    print ("length_field : " + length_field)
     length_value, ignore_new_line, ignore = length_field.partition(NEW_LINE)
-    print ("length_value : " + length_value)
     buffer_length = int(length_value)
-    buffer_length_str = str(buffer_length)
-    print ("buffer_length_str : " + buffer_length_str)
 else :
     print ("ERROR Incomplete HTTP Response Header")
     sys.exit("Exiting Program")
 
 
-sys.exit()
 
 
-# acquire receive size
-
-
-
-
-
-
-#buffer_length_str = binary_message.decode (charset)
-#buffer_length = int(buffer_length_str)
-#print ("buffer_length_str : " + buffer_length_str)
+# receive the body
+binary_body = bytearray()
+try :
+    while True :
+        response = sock.recv (4096)
+        binary_body += response
+        bytes_received += len(response)
+        if bytes_received >= buffer_length : break
+        #if not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
+    sys.exit ("Exiting Program")
 
 # Close the Socket
 sock.close()
@@ -296,50 +296,15 @@ sock.close()
 
 
 
-
-
-# split the response into header and body
-#try :
-#    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
-#except ValueError :
-#    print ("ERROR Parsing Response")
-#    sys.exit ("Exiting Program")
-
-# decode the header
-#try :
-#    response_header = binary_header.decode (charset)
-#except OSError :
-#    print ("ERROR Decoding Image Header")
-#    sys.exit ("Exiting Program")
-
-# add delimiter to header
-#response_header += END_HEADER
-
-
-
-
-
-
-# print the Header
-try :
-    sys.stderr.write (response_header)
-except Exception :
-    print ("ERROR Writing Response Header")
-    sys.exit ("Exiting Program")
-sys.exit()
-
-
-
-
 # declare variables for to parse header content
 CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
-CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
 CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
 EMPTY_MESSAGE = "empty"
 message_type = EMPTY_MESSAGE
 char_field = EMPTY_MESSAGE
+
 
 
 
@@ -364,6 +329,7 @@ if x != -1 :
         sys.exit ("Exiting Program")
 
 print ("charset : " + charset)
+
 
 
 
@@ -399,3 +365,35 @@ if message_type != EMPTY_MESSAGE :
 # Close the program
 sys.exit()
 # eof
+
+
+
+
+
+
+
+
+
+
+
+
+#buffer_length_str = binary_message.decode (charset)
+#buffer_length = int(buffer_length_str)
+#print ("buffer_length_str : " + buffer_length_str)
+
+# split the response into header and body
+#try :
+#    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
+#except ValueError :
+#    print ("ERROR Parsing Response")
+#    sys.exit ("Exiting Program")
+
+# decode the header
+#try :
+#    response_header = binary_header.decode (charset)
+#except OSError :
+#    print ("ERROR Decoding Image Header")
+#    sys.exit ("Exiting Program")
+
+# add delimiter to header
+#response_header += END_HEADER
