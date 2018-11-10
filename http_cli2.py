@@ -413,6 +413,7 @@ print ("message_type : " + message_type)
 
 
 
+byte_file = open('tempFile.txt', 'wb')
 
 
     # receive message back from server in byte stream

@@ -234,8 +234,8 @@ byte_file = open('tempFile.txt', 'wb')
 # receive header first
 try :
     while True :
-        response = sock.recv (4096)
-        binary_message += response
+        response = sock.recv (65536)
+        byte_file.write(response)
         if not response : break
 except OSError :
     print ("ERROR Receiving Response: ")
@@ -248,9 +248,9 @@ sock.close()
 
 
 # split the data into header and body
-binary_body = bytearray()
-binary_header = bytearray()
-binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
+with open('tempFile.txt', 'rb') as f:
+    data = f.read()
+binary_header, ignore_delim, binary_body = data.partition(header_delim_in_bytes)
 
 
 
