@@ -247,6 +247,9 @@ except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
 
+# Close the Socket
+sock.close()
+
 
 
 
@@ -254,6 +257,7 @@ except OSError :
 binary_body = bytearray()
 binary_header = bytearray()
 binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
+
 # decode the header
 try :
     response_header = binary_header.decode (charset)
@@ -268,39 +272,6 @@ except Exception :
     print ("ERROR Writing Response Header")
     sys.exit ("Exiting Program")
 
-# declare variables for to parse header content
-CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
-
-# scan header for Content-Length
-x = response_header.find(CONTENT_LENGTH)
-# acquire receive size
-if x != -1 :
-    ignore, length_field = response_header.split(CONTENT_LENGTH, 2)
-    length_value, ignore_new_line, ignore = length_field.partition(NEW_LINE)
-    buffer_length = int(length_value)
-else :
-    print ("ERROR Incomplete HTTP Response Header")
-    sys.exit("Exiting Program")
-
-
-
-
-# receive the body
-binary_body = bytearray()
-try :
-    while True :
-        body_response = sock.recv (4096)
-        binary_body += body_response
-        bytes_received += len(body_response)
-        if bytes_received >= buffer_length : break
-        #if not response : break
-except OSError :
-    print ("ERROR Receiving Response: ")
-    sys.exit ("Exiting Program")
-
-# Close the Socket
-sock.close()
-
 
 
 
@@ -309,9 +280,8 @@ CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
 CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
-#EMPTY_MESSAGE = "empty"
-message_type = ""       #EMPTY_MESSAGE
-char_field = ""         #EMPTY_MESSAGE
+message_type = ""
+char_field = ""
 
 
 
@@ -367,7 +337,6 @@ elif y != -1 :
 else :
     print ("ERROR Invalid Content-Type")
     sys.exit ("Exiting Program")
-
 
 
 

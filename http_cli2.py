@@ -359,3 +359,48 @@ try :
 except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
+
+
+
+
+
+
+
+
+
+
+
+
+# declare variables for to parse header content
+CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
+CHARSET_FIELD = "charset="
+TEXT = "text"
+IMAGE = "image"
+#EMPTY_MESSAGE = "empty"
+message_type = ""       #EMPTY_MESSAGE
+char_field = ""         #EMPTY_MESSAGE
+
+
+
+
+# parse header for content type
+x = response_header.find(CONTENT_TYPE)
+if x != -1 :
+    # parse response header for content type field
+    ignore_field, ignore_type, message_type  = \
+        response_header.partition(CONTENT_TYPE)
+    # parse content type field for the type
+    message_type, ignore_SEMI_COLON, char_field = \
+        message_type.partition(SEMI_COLON)
+    # parse the remainder for the charset field
+    ignore_field, char_field, charset = \
+        char_field.partition(CHARSET_FIELD)
+    # parse the charset field for the value
+    charset, ignore, ignore_field = \
+        charset.partition(NEW_LINE)
+else :
+    print ("ERROR Parsing Header")
+    sys.exit ("Exiting Program")
+
+print ("charset : " + charset)
+print ("message_type : " + message_type)
