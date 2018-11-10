@@ -229,7 +229,8 @@ except UnicodeError :
 
 
 # receive message back from server in byte stream
-binary_message = bytearray()
+byte_file = open('tempFile.txt', 'wb')
+#binary_message = bytearray()
 # receive header first
 try :
     while True :

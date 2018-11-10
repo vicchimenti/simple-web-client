@@ -404,3 +404,28 @@ else :
 
 print ("charset : " + charset)
 print ("message_type : " + message_type)
+
+
+
+
+
+
+
+
+
+
+
+    # receive message back from server in byte stream
+    while True :
+        # image file type
+        response = sock.recv(65536)
+        byte_file.write(response)
+        if  not response : break
+
+    # split the response into header and body
+    with open('tempFile.txt', 'rb') as f:
+        data = f.read()
+    byte_header, image_body = (data.split(delim_in_bytes, 2))
+    # decode the header
+    image_header = byte_header.decode('utf-8')
+    image_header += delim
