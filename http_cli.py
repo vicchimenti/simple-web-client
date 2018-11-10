@@ -297,7 +297,6 @@ if sc != -1 :
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
-            sys.stderr.write("type says text \n")
         except Exception :
             print ("ERROR Writing Text Response Body")
             sys.exit ("Exiting Program")
@@ -306,7 +305,6 @@ if sc != -1 :
         # print image message body
         try :
             sys.stdout.buffer.write (binary_body)
-            sys.stderr.write("type says image \n")
         except Exception :
             print ("ERROR Writing Image Response Body")
             sys.exit ("Exiting Program")
