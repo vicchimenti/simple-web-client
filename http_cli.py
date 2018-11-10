@@ -262,7 +262,6 @@ if sc != -1 :
 
     # parse header for content type
     x = response_header.find(CONTENT_TYPE)
-    y = response_header.find(CHARSET_FIELD)
 
     # parse response header for content type field
     if x != -1 :
@@ -271,14 +270,20 @@ if sc != -1 :
         # parse content type field for the type
         message_type, ignore_SEMI_COLON, char_field = \
             message_type.partition(SEMI_COLON)
+        # parse content type for character set
+        y = response_header.find(CHARSET_FIELD)
 
-    # parse the remainder for the charset field
-    elif y != -1 :
-        ignore_field, char_field, charset = \
-            char_field.partition(CHARSET_FIELD)
-        # parse the charset field for the value
-        charset, ignore, ignore_field = \
-            charset.partition(NEW_LINE)
+        # parse the remainder for the charset field
+        if y != -1 :
+            try :
+                ignore_field, char_field, charset = \
+                    char_field.partition(CHARSET_FIELD)
+                # parse the charset field for the value
+                charset, ignore, ignore_field = \
+                    charset.partition(NEW_LINE)
+            except Exception :
+                sys.stderr.write ("ERROR Parsing for charset= : ")
+                sys.exit ("Exiting Program")
 
     # or else it's an invalid header
     else :
