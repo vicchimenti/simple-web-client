@@ -320,7 +320,7 @@ else :
         response_body = binary_body.decode(charset)
         sys.stdout.write (response_body)
     except Exception :
-        sys.stderr.write ("ERROR Writing Response Body : Status Code not 200 OK")
+        sys.stderr.write ("ERROR Writing Response Body : Status Code not 200 OK : ")
         sys.exit ("Exiting Program")
 
 
@@ -329,35 +329,3 @@ else :
 # Close the program
 sys.exit()
 # eof
-
-
-
-
-
-
-
-
-
-
-
-
-#buffer_length_str = binary_message.decode (charset)
-#buffer_length = int(buffer_length_str)
-#print ("buffer_length_str : " + buffer_length_str)
-
-# split the response into header and body
-#try :
-#    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
-#except ValueError :
-#    print ("ERROR Parsing Response")
-#    sys.exit ("Exiting Program")
-
-# decode the header
-#try :
-#    response_header = binary_header.decode (charset)
-#except OSError :
-#    print ("ERROR Decoding Image Header")
-#    sys.exit ("Exiting Program")
-
-# add delimiter to header
-#response_header += END_HEADER
