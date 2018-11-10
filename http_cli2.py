@@ -326,3 +326,107 @@ else :
 # Close the program
 sys.exit()
 # eof
+
+
+
+
+# declare variables for to parse header content
+CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+
+# scan header for Content-Length
+x = response_header.find(CONTENT_LENGTH)
+# acquire receive size
+if x != -1 :
+    ignore, length_field = response_header.split(CONTENT_LENGTH, 2)
+    length_value, ignore_new_line, ignore = length_field.partition(NEW_LINE)
+    buffer_length = int(length_value)
+else :
+    print ("ERROR Incomplete HTTP Response Header")
+    sys.exit("Exiting Program")
+
+
+
+
+# receive the body
+binary_body = bytearray()
+try :
+    while True :
+        body_response = sock.recv (4096)
+        binary_body += body_response
+        bytes_received += len(body_response)
+        if bytes_received >= buffer_length : break
+        #if not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
+    sys.exit ("Exiting Program")
+
+
+
+
+
+
+
+
+
+
+
+
+# declare variables for to parse header content
+CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
+CHARSET_FIELD = "charset="
+TEXT = "text"
+IMAGE = "image"
+#EMPTY_MESSAGE = "empty"
+message_type = ""       #EMPTY_MESSAGE
+char_field = ""         #EMPTY_MESSAGE
+
+
+
+
+# parse header for content type
+x = response_header.find(CONTENT_TYPE)
+if x != -1 :
+    # parse response header for content type field
+    ignore_field, ignore_type, message_type  = \
+        response_header.partition(CONTENT_TYPE)
+    # parse content type field for the type
+    message_type, ignore_SEMI_COLON, char_field = \
+        message_type.partition(SEMI_COLON)
+    # parse the remainder for the charset field
+    ignore_field, char_field, charset = \
+        char_field.partition(CHARSET_FIELD)
+    # parse the charset field for the value
+    charset, ignore, ignore_field = \
+        charset.partition(NEW_LINE)
+else :
+    print ("ERROR Parsing Header")
+    sys.exit ("Exiting Program")
+
+print ("charset : " + charset)
+print ("message_type : " + message_type)
+
+
+
+
+
+
+
+
+
+byte_file = open('tempFile.txt', 'wb')
+
+
+    # receive message back from server in byte stream
+    while True :
+        # image file type
+        response = sock.recv(65536)
+        byte_file.write(response)
+        if  not response : break
+
+    # split the response into header and body
+    with open('tempFile.txt', 'rb') as f:
+        data = f.read()
+    byte_header, image_body = (data.split(delim_in_bytes, 2))
+    # decode the header
+    image_header = byte_header.decode('utf-8')
+    image_header += delim

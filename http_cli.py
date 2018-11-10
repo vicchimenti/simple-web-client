@@ -39,16 +39,12 @@ charset = "UTF-8"                       # default encoding protocol
 # set constants
 DOUBLE_SLASH = "//"                     # delimiter for parsing URLs
 SINGLE_SLASH = "/"                      # delimiter for parsing URL paths
-NEW_LINE = "\r\n"
 COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
+NEW_LINE = "\r\n"                       # delimiter for new line return
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
-END_RESPONSE = "\r\n\t\r\n\t"
+END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
-
-
-
-
 
 
 
@@ -81,9 +77,8 @@ else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
 # validate full_URL
 x = len(full_URL)
 if x < 5 :
-    print ("ERROR Invalid URL Format")
+    sys.stderr.write ("ERROR Invalid URL Format")
     sys.exit()
-
 
 
 
@@ -103,8 +98,6 @@ if x != -1 :
         portstr = portPathway[:y]
         path = portPathway[y:]
         port = int (portstr)
-        print ("Portstr if : " + portstr)
-        print ("Path if : " + path)
     else :
         port = int (portPathway)
 
@@ -127,19 +120,6 @@ if x <= 1 :
 
 
 
-# ***** TS OUTPUT ********
-print ("argument : " + sys.argv[1])
-print ("user_input : " + user_input)
-#print ("portPathway : " + portPathway)
-print ("full_url : " + full_URL)
-print ("Path : " + path)
-print ("Host : " + host)
-pseudoPort = str(port)
-print ("pseudoPort = " + pseudoPort)
-
-
-
-
 # validate URL entered and assign host IP number
 try :
     host_ip = socket.gethostbyname(host)
@@ -152,8 +132,6 @@ host_ip_str = str(host_ip)
 if host_ip_str == MATCH_ALL :
         print ("ERROR Invalid IP Number")
         sys.exit ("Exiting Program")
-
-print ("host_ip_str : " + host_ip_str)
 
 
 
@@ -174,21 +152,20 @@ except OSError :
     sys.exit ("Exiting Program")
 
 
+
+
 # prepare message for server with delimiter included
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
                   + END_HEADER
 
-
-
-
 # display GET Request
 try :
     sys.stderr.write (message)
-except :
-    tb = sys.exc_info()
-    print ("ERROR Standard Error Write : " + tb)
+except Exception :
+    print ("ERROR Standard Error Write ")
+    sys.exit("Exiting Program")
 
 
 
@@ -216,22 +193,6 @@ except UnicodeError :
 
 
 
-# receive message back from server in byte stream
-binary_message = bytearray()
-try :
-    while True :
-        response = sock.recv (4096)
-        binary_message += response
-        x = binary_message.find(response_delim_in_bytes)
-        if x != -1 : break
-        if not response : break
-except OSError :
-    print ("ERROR Receiving Response: ")
-    sys.exit ("Exiting Program")
-
-#buffer_length_str = binary_message.decode (charset)
-#buffer_length = int(buffer_length_str)
-#print ("buffer_length_str : " + buffer_length_str)
 
 # encode the Header delimiter to binary
 try :
@@ -240,12 +201,34 @@ except UnicodeError :
     print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
 
-# split the response into header and body
+
+
+
+# receive message back from server in byte stream
+binary_message = bytearray()
+# receive header first
 try :
-    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
-except ValueError :
-    print ("ERROR Parsing Response")
+    while True :
+        response = sock.recv (65536)
+        binary_message += response
+        if not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
+
+# Close the Socket
+sock.close()
+
+
+
+
+# split the data into header and body
+#binary_body = bytearray()
+#binary_header = bytearray()
+binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
+
+
+
 
 # decode the header
 try :
@@ -253,13 +236,8 @@ try :
 except OSError :
     print ("ERROR Decoding Image Header")
     sys.exit ("Exiting Program")
-
-# add delimiter to header
+# add delimiter
 response_header += END_HEADER
-
-# Close the Socket
-sock.close()
-
 
 
 
@@ -269,24 +247,31 @@ try :
 except Exception :
     print ("ERROR Writing Response Header")
     sys.exit ("Exiting Program")
-sys.exit()
+
 
 
 
 # declare variables for to parse header content
 CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
-CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
 CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
-EMPTY_MESSAGE = "empty"
-message_type = EMPTY_MESSAGE
-char_field = EMPTY_MESSAGE
+message_type = ""
+char_field = ""
 
-# parse header for content type
-x = response_header.find(CONTENT_TYPE)
-if x != -1 :
-    try :
+
+
+
+# check for status code
+STATUS_CODE = "200 OK"
+sc = response_header.find(STATUS_CODE)
+
+# if the status code is 200 OK
+if sc != -1 :
+
+    # parse header for content type
+    x = response_header.find(CONTENT_TYPE)
+    if x != -1 :
         # parse response header for content type field
         ignore_field, ignore_type, message_type  = \
             response_header.partition(CONTENT_TYPE)
@@ -299,39 +284,46 @@ if x != -1 :
         # parse the charset field for the value
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
-    except EXCEPTION :
-        print ("ERROR Parsing Header")
+    else :
+        sys.stderr.write ("ERROR Parsing Header")
         sys.exit ("Exiting Program")
 
-print ("charset : " + charset)
 
-
-
-# process response, store data in variables and display results
-if message_type != EMPTY_MESSAGE :
-
-    # confirm that non-text is an text/html type
-    x = message_type.find(TEXT)
-    if x != -1 :
-        # print message body
+    # determine content type and print the message body
+    y = message_type.find(TEXT)
+    z = message_type.find(IMAGE)
+    if y != -1 :
+        # print text/html message body
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
+            sys.stderr.write("type says text \n")
         except Exception :
-            print ("ERROR Writing Response Body")
+            print ("ERROR Writing Text Response Body")
+            sys.exit ("Exiting Program")
+
+    elif z != -1 :
+        # print image message body
+        try :
+            sys.stdout.buffer.write (binary_body)
+            sys.stderr.write("type says image \n")
+        except Exception :
+            print ("ERROR Writing Image Response Body")
             sys.exit ("Exiting Program")
 
     else :
-        # confirm that non-text is an image type
-        x = message_type.find(IMAGE)
-        if x != -1 :
-            # print message body
-            try :
-                sys.stdout.buffer.write (binary_body)
-            except Exception :
-                print ("ERROR Writing Image Response Body")
-                sys.exit ("Exiting Program")
+        sys.stderr.write ("ERROR Invalid Content-Type")
+        sys.exit ("Exiting Program")
 
+
+# or else the Status Code is not 200 OK
+else :
+    try :
+        response_body = binary_body.decode(charset)
+        sys.stdout.write (response_body)
+    except Exception :
+        print ("ERROR Writing Response Body : Status Code not 200 OK")
+        sys.exit ("Exiting Program")
 
 
 
@@ -339,3 +331,35 @@ if message_type != EMPTY_MESSAGE :
 # Close the program
 sys.exit()
 # eof
+
+
+
+
+
+
+
+
+
+
+
+
+#buffer_length_str = binary_message.decode (charset)
+#buffer_length = int(buffer_length_str)
+#print ("buffer_length_str : " + buffer_length_str)
+
+# split the response into header and body
+#try :
+#    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
+#except ValueError :
+#    print ("ERROR Parsing Response")
+#    sys.exit ("Exiting Program")
+
+# decode the header
+#try :
+#    response_header = binary_header.decode (charset)
+#except OSError :
+#    print ("ERROR Decoding Image Header")
+#    sys.exit ("Exiting Program")
+
+# add delimiter to header
+#response_header += END_HEADER
