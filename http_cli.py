@@ -231,8 +231,6 @@ except UnicodeError :
 
 # receive message back from server in byte stream
 binary_message = bytearray()
-#bytes_received = 0
-#bytes_expected = 20
 # receive header first
 try :
     while True :
