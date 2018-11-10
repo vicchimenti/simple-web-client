@@ -313,9 +313,7 @@ if sc != -1 :
             sys.stderr.write ("ERROR Parsing for charset= : ")
             sys.exit ("Exiting Program")
 
-    # the charset= field was not declared in the header - use the default
-    else :
-        charset = "UTF-8"
+
 
 
     # determine content type and print the message body
