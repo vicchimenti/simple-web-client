@@ -216,22 +216,6 @@ except UnicodeError :
 
 
 
-# receive message back from server in byte stream
-binary_message = bytearray()
-try :
-    while True :
-        response = sock.recv (4096)
-        binary_message += response
-        x = binary_message.find(response_delim_in_bytes)
-        if x != -1 : break
-        if not response : break
-except OSError :
-    print ("ERROR Receiving Response: ")
-    sys.exit ("Exiting Program")
-
-#buffer_length_str = binary_message.decode (charset)
-#buffer_length = int(buffer_length_str)
-#print ("buffer_length_str : " + buffer_length_str)
 
 # encode the Header delimiter to binary
 try :
@@ -240,11 +224,23 @@ except UnicodeError :
     print ("ERROR Encoding Delimiter")
     sys.exit ("Exiting Program")
 
-# split the response into header and body
+
+
+
+# receive message back from server in byte stream
+binary_header = bytearray()
+bytes_received = 0
+# receive header first
 try :
-    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
-except ValueError :
-    print ("ERROR Parsing Response")
+    while True :
+        response = sock.recv (4096)
+        binary_header += response
+        bytes_received += len(response)
+        x = binary_header.find(header_delim_in_bytes)
+        if x != -1 : break
+        #if not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
 
 # decode the header
@@ -254,11 +250,72 @@ except OSError :
     print ("ERROR Decoding Image Header")
     sys.exit ("Exiting Program")
 
-# add delimiter to header
-response_header += END_HEADER
+# print the Header
+try :
+    sys.stderr.write (response_header)
+except Exception :
+    print ("ERROR Writing Response Header")
+    sys.exit ("Exiting Program")
+
+# declare variables for to parse header content
+CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+
+# scan header for Content-Length
+x = response_header.find(CONTENT_LENGTH)
+
+if x != -1 :
+    ignore, length_field = response_header.split(CONTENT_LENGTH, 2)
+    print ("length_field : " + length_field)
+    length_value, ignore_new_line, ignore = length_field.partition(NEW_LINE)
+    print ("length_value : " + length_value)
+    buffer_length = int(length_value)
+    buffer_length_str = str(buffer_length)
+    print ("buffer_length_str : " + buffer_length_str)
+else :
+    print ("ERROR Incomplete HTTP Response Header")
+    sys.exit("Exiting Program")
+
+
+sys.exit()
+
+
+# acquire receive size
+
+
+
+
+
+
+#buffer_length_str = binary_message.decode (charset)
+#buffer_length = int(buffer_length_str)
+#print ("buffer_length_str : " + buffer_length_str)
 
 # Close the Socket
 sock.close()
+
+
+
+
+
+
+# split the response into header and body
+#try :
+#    binary_header, binary_body = (binary_message.split(header_delim_in_bytes, 2))
+#except ValueError :
+#    print ("ERROR Parsing Response")
+#    sys.exit ("Exiting Program")
+
+# decode the header
+#try :
+#    response_header = binary_header.decode (charset)
+#except OSError :
+#    print ("ERROR Decoding Image Header")
+#    sys.exit ("Exiting Program")
+
+# add delimiter to header
+#response_header += END_HEADER
+
+
 
 
 
@@ -273,6 +330,7 @@ sys.exit()
 
 
 
+
 # declare variables for to parse header content
 CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
 CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
@@ -282,6 +340,8 @@ IMAGE = "image"
 EMPTY_MESSAGE = "empty"
 message_type = EMPTY_MESSAGE
 char_field = EMPTY_MESSAGE
+
+
 
 # parse header for content type
 x = response_header.find(CONTENT_TYPE)
