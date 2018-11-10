@@ -44,12 +44,7 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
 END_RESPONSE = "\r\n\t\r\n\t"
-
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
-
-
-
-
 
 
 
@@ -104,8 +99,6 @@ if x != -1 :
         portstr = portPathway[:y]
         path = portPathway[y:]
         port = int (portstr)
-        print ("Portstr if : " + portstr)
-        print ("Path if : " + path)
     else :
         port = int (portPathway)
 
@@ -128,19 +121,6 @@ if x <= 1 :
 
 
 
-# ***** TS OUTPUT ********
-print ("argument : " + sys.argv[1])
-print ("user_input : " + user_input)
-#print ("portPathway : " + portPathway)
-print ("full_url : " + full_URL)
-print ("Path : " + path)
-print ("Host : " + host)
-pseudoPort = str(port)
-print ("pseudoPort = " + pseudoPort)
-
-
-
-
 # validate URL entered and assign host IP number
 try :
     host_ip = socket.gethostbyname(host)
@@ -153,8 +133,6 @@ host_ip_str = str(host_ip)
 if host_ip_str == MATCH_ALL :
         print ("ERROR Invalid IP Number")
         sys.exit ("Exiting Program")
-
-print ("host_ip_str : " + host_ip_str)
 
 
 
@@ -175,14 +153,13 @@ except OSError :
     sys.exit ("Exiting Program")
 
 
+
+
 # prepare message for server with delimiter included
 message = "GET "  + path \
                   + " HTTP/1.1\r\nConnection: close\r\nHost: " \
                   + host \
                   + END_HEADER
-
-
-
 
 # display GET Request
 try :
@@ -229,13 +206,12 @@ except UnicodeError :
 
 
 # receive message back from server in byte stream
-byte_file = open('tempFile.txt', 'wb')
-#binary_message = bytearray()
+binary_message = bytearray()
 # receive header first
 try :
     while True :
         response = sock.recv (65536)
-        byte_file.write(response)
+        binary_message += response
         if not response : break
 except OSError :
     print ("ERROR Receiving Response: ")
@@ -248,9 +224,9 @@ sock.close()
 
 
 # split the data into header and body
-with open('tempFile.txt', 'rb') as f:
-    data = f.read()
-binary_header, ignore_delim, binary_body = data.partition(header_delim_in_bytes)
+binary_body = bytearray()
+binary_header = bytearray()
+binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 
 
 
@@ -276,13 +252,6 @@ except Exception :
 
 
 
-# check for status code
-STATUS_CODE = "200 OK"
-sc = response_header.find(STATUS_CODE)
-
-
-
-
 # declare variables for to parse header content
 CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
 CHARSET_FIELD = "charset="
@@ -293,7 +262,14 @@ char_field = ""
 
 
 
+
+# check for status code
+STATUS_CODE = "200 OK"
+sc = response_header.find(STATUS_CODE)
+
+# if the status code is 200 OK
 if sc != -1 :
+
     # parse header for content type
     x = response_header.find(CONTENT_TYPE)
     if x != -1 :
@@ -313,52 +289,41 @@ if sc != -1 :
         print ("ERROR Parsing Header")
         sys.exit ("Exiting Program")
 
-    print ("charset : " + charset)
-    print ("message_type : " + message_type)
 
-
-
-
-
-
-
-
-if sc != -1 :
     # determine content type and print the message body
-    x = message_type.find(TEXT)
-    y = message_type.find(IMAGE)
-    if x != -1 :
+    y = message_type.find(TEXT)
+    z = message_type.find(IMAGE)
+    if y != -1 :
         # print text/html message body
-        x_str = str(x)
-        print ("in if x : " + x_str)
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
-            print ("response_body : " + response_body)
-            print ("in if x2 : " + x_str)
         except Exception :
             print ("ERROR Writing Text Response Body")
             sys.exit ("Exiting Program")
 
-    elif y != -1 :
+    elif z != -1 :
         # print image message body
         try :
             sys.stdout.buffer.write (binary_body)
         except Exception :
             print ("ERROR Writing Image Response Body")
             sys.exit ("Exiting Program")
+
     else :
         print ("ERROR Invalid Content-Type")
         sys.exit ("Exiting Program")
+
+
+# or else the Status Code is not 200 OK
 else :
-    # Status Code is not 200 OK
     try :
         response_body = binary_body.decode(charset)
         sys.stdout.write (response_body)
-        print ("response_body : " + response_body)
     except Exception :
         print ("ERROR Writing Response Body : Status Code not 200 OK")
         sys.exit ("Exiting Program")
+
 
 
 
