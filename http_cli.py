@@ -15,7 +15,8 @@
 # fixed command line parameters feedback
 # fixed URL handling feedback
 # fixed HTTP Request feedback
-# fixed image parsing algorithm
+# fixed Content-Type parsing algorithm
+# fixed charset= parsing algorithm
 
 
 
@@ -186,7 +187,7 @@ except OSError :
 
 # encode the Header delimiter to binary
 try :
-    header_delim_in_bytes = END_HEADER.encode (charset)
+    delim_in_bytes = END_HEADER.encode (charset)
 except UnicodeError :
     sys.stderr.write ("ERROR Encoding Delimiter : ")
     sys.exit ("Exiting Program")
@@ -201,7 +202,9 @@ try :
     while True :
         response = sock.recv (65536)
         binary_message += response
-        if not response : break
+        x = binary_message.find(delim_in_bytes)
+        if x != -1 : break
+        #if not response : break
 except OSError :
     sys.stderr.write ("ERROR Receiving Response : ")
     sys.exit ("Exiting Program")
@@ -215,8 +218,7 @@ sock.close()
 # split the data into header and body
 binary_body = bytearray()
 binary_header = bytearray()
-binary_header, ignore, binary_body = binary_message.partition(header_delim_in_bytes)
-#binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
+binary_header, ignore, binary_body = binary_message.partition(delim_in_bytes)
 
 
 
@@ -273,7 +275,7 @@ if sc != -1 :
         # parse content type for character set
         y = response_header.find(CHARSET_FIELD)
 
-        # parse the remainder for the charset field
+        # parse the remainder for the charset field if present
         if y != -1 :
             try :
                 ignore_field, char_field, charset = \
