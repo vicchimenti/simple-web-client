@@ -184,16 +184,6 @@ except OSError :
 
 
 
-# encode the Response delimiter to binary
-try :
-    response_delim_in_bytes = END_RESPONSE.encode (charset)
-except UnicodeError :
-    sys.stderr.write ("ERROR Encoding Delimiter : ")
-    sys.exit ("Exiting Program")
-
-
-
-
 # encode the Header delimiter to binary
 try :
     header_delim_in_bytes = END_HEADER.encode (charset)
@@ -225,7 +215,8 @@ sock.close()
 # split the data into header and body
 binary_body = bytearray()
 binary_header = bytearray()
-binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
+binary_header, ignore, binary_body = binary_message.partition(header_delim_in_bytes)
+#binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 
 
 
@@ -271,19 +262,25 @@ if sc != -1 :
 
     # parse header for content type
     x = response_header.find(CONTENT_TYPE)
+    y = response_header.find(CHARSET_FIELD)
+
+    # parse response header for content type field
     if x != -1 :
-        # parse response header for content type field
         ignore_field, ignore_type, message_type  = \
             response_header.partition(CONTENT_TYPE)
         # parse content type field for the type
         message_type, ignore_SEMI_COLON, char_field = \
             message_type.partition(SEMI_COLON)
-        # parse the remainder for the charset field
+
+    # parse the remainder for the charset field
+    elif y != -1 :
         ignore_field, char_field, charset = \
             char_field.partition(CHARSET_FIELD)
         # parse the charset field for the value
         charset, ignore, ignore_field = \
             charset.partition(NEW_LINE)
+
+    # or else it's an invalid header
     else :
         sys.stderr.write ("ERROR Parsing Header : ")
         sys.exit ("Exiting Program")
