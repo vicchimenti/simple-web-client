@@ -220,9 +220,6 @@ except OSError :
     sys.stderr.write ("ERROR Receiving Response : ")
     sys.exit ("Exiting Program")
 
-# Close the Socket
-sock.close()
-
 
 
 
@@ -354,7 +351,8 @@ else :
 
 
 
-
+# Close the Socket
+sock.close()
 # Close the program
 sys.exit()
 # eof
