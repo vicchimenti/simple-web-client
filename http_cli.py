@@ -301,7 +301,6 @@ if sc != -1 :
         sys.stderr.write ("ERROR Parsing Header : ")
         sys.exit ("Exiting Program")
 
-
     # parse the remainder for the charset field if present
     if y != -1 :
         try :
