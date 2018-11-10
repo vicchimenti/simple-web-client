@@ -144,7 +144,7 @@ except OSError :
     sys.exit ("Exiting Program")
 
 # Connect to the server as a client
-sock.settimeout(5)
+sock.settimeout(10)
 try :
     sock.connect ((host, port))
 except OSError :
@@ -223,8 +223,8 @@ sock.close()
 
 
 # split the data into header and body
-#binary_body = bytearray()
-#binary_header = bytearray()
+binary_body = bytearray()
+binary_header = bytearray()
 binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 
 
