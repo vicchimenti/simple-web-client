@@ -170,7 +170,6 @@ except OSError :
 sock.settimeout(5)
 try :
     sock.connect ((host, port))
-    sock.setblocking(0)
 except OSError :
     print ("ERROR Connecting")
     sys.exit ("Exiting Program")
