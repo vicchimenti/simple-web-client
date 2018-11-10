@@ -238,10 +238,6 @@ try :
     while True :
         response = sock.recv (4096)
         binary_message += response
-        #bytes_received += len(header_response)
-        #if bytes_received == bytes_expected : break
-        #x = binary_header.find(header_delim_in_bytes)
-        #if x != -1 : break
         if not response : break
 except OSError :
     print ("ERROR Receiving Response: ")
