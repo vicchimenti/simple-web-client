@@ -258,12 +258,7 @@ except OSError :
     print ("ERROR Decoding Image Header")
     sys.exit ("Exiting Program")
 
-# print the Header
-try :
-    sys.stderr.write (response_header)
-except Exception :
-    print ("ERROR Writing Response Header")
-    sys.exit ("Exiting Program")
+
 
 
 
@@ -304,7 +299,17 @@ print ("message_type : " + message_type)
 
 
 
-# determine content type
+# print the Header
+try :
+    sys.stderr.write (response_header)
+except Exception :
+    print ("ERROR Writing Response Header")
+    sys.exit ("Exiting Program")
+
+
+
+
+# determine content type and print the message body
 x = message_type.find(TEXT)
 y = message_type.find(IMAGE)
 if x != -1 :
