@@ -221,7 +221,7 @@ sock.close()
 
 
 
-
+# ********** TODO : Evaluate this Split, it may be causing an issue ********
 # split the data into header and body
 binary_body = bytearray()
 binary_header = bytearray()
