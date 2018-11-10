@@ -67,13 +67,15 @@ except Exception :
 
 
 # parse user_input to expose full URL
-x = user_input.find (DOUBLE_SLASH)
-
-# if no http:// protocol was entered by the user
-if x == -1 : full_URL = user_input
-
-# if an http:// protocol was entered with the URL
-else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
+try :
+    x = user_input.find (DOUBLE_SLASH)
+    # if no http:// protocol was entered by the user
+    if x == -1 : full_URL = user_input
+    # if an http:// protocol was entered with the URL
+    else : protocol, full_URL = (user_input.split (DOUBLE_SLASH , 2))
+except Exception :
+    sys.stderr.write ("ERROR Parsing User Input : ")
+    sys.exit("Exiting Program")
 
 # validate full_URL
 x = len(full_URL)
@@ -86,32 +88,43 @@ if x < 5 :
 
 # parse full URL for domain, path and port number
 x = full_URL.find (COLON)
-
 # if there is a COLON in the user input
 if x != -1 :
-    # parse the host domain from the full URL
-    host, portPathway = (full_URL.split (COLON , 2))
+    try :
+        # parse the host domain from the full URL
+        host, portPathway = (full_URL.split (COLON , 2))
+    except Exception :
+        sys.stderr.write ("ERROR Parsing Host input : ")
+        sys.exit("Exiting Program")
+
     # search for a path after the port number
     y = portPathway.find (SINGLE_SLASH)
-
-    # if there is a path after the port number
-    if y != -1 :
-        portstr = portPathway[:y]
-        path = portPathway[y:]
-        port = int (portstr)
-    else :
-        port = int (portPathway)
+    try :
+        # if there is a path after the port number
+        if y != -1 :
+            portstr = portPathway[:y]
+            path = portPathway[y:]
+            port = int (portstr)
+        else :
+            port = int (portPathway)
+    except Exception :
+        sys.stderr.write ("ERROR Parsing Port Number : ")
+        sys.exit("Exiting Program")
 
 # if there is no COLON in the user input, then use default port
 else :
-    # parse domain from path with new delimiter
-    x = full_URL.find (SINGLE_SLASH)
-    if x != -1 :
-        host = full_URL[:x]
-        path = full_URL[x:]
-    else :
-        host = full_URL
-        path = SINGLE_SLASH
+    try :
+        # parse domain from path with new delimiter
+        x = full_URL.find (SINGLE_SLASH)
+        if x != -1 :
+            host = full_URL[:x]
+            path = full_URL[x:]
+        else :
+            host = full_URL
+            path = SINGLE_SLASH
+    except Exception :
+        sys.stderr.write ("ERROR Parsing Path : ")
+        sys.exit("Exiting Program")
 
 # confirm that the path contains any value after first slash
 x = len(path)
@@ -202,9 +215,7 @@ try :
     while True :
         response = sock.recv (65536)
         binary_message += response
-        x = binary_message.find(delim_in_bytes)
-        if x != -1 : break
-        #if not response : break
+        if not response : break
 except OSError :
     sys.stderr.write ("ERROR Receiving Response : ")
     sys.exit ("Exiting Program")
@@ -214,11 +225,17 @@ sock.close()
 
 
 
+
 # ********** TODO : Evaluate this Split, it may be causing an issue ********
 # split the data into header and body
 binary_body = bytearray()
 binary_header = bytearray()
-binary_header, ignore, binary_body = binary_message.partition(delim_in_bytes)
+try :
+    binary_header, ignore, binary_body = \
+        binary_message.partition(delim_in_bytes)
+except Exception :
+    sys.stderr.write ("ERROR With Binary Partition : ")
+    sys.exit ("Exiting Program")
 
 
 
@@ -234,6 +251,7 @@ response_header += END_HEADER
 
 
 
+
 # print the Header
 try :
     sys.stderr.write (response_header)
@@ -245,7 +263,7 @@ except Exception :
 
 
 # declare variables for to parse header content
-CONTENT_TYPE = "Content-Type:"          # delimiter to find content type
+CONTENT_TYPE = "Content-Type:"
 CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
@@ -264,40 +282,48 @@ if sc != -1 :
 
     # parse header for content type
     x = response_header.find(CONTENT_TYPE)
-
     # parse response header for content type field
     if x != -1 :
-        ignore_field, ignore_type, message_type  = \
-            response_header.partition(CONTENT_TYPE)
-        # parse content type field for the type
-        message_type, ignore_SEMI_COLON, char_field = \
-            message_type.partition(SEMI_COLON)
-        # parse content type for character set
-        y = response_header.find(CHARSET_FIELD)
-
-        # parse the remainder for the charset field if present
-        if y != -1 :
-            try :
-                ignore_field, char_field, charset = \
-                    char_field.partition(CHARSET_FIELD)
-                # parse the charset field for the value
-                charset, ignore, ignore_field = \
-                    charset.partition(NEW_LINE)
-            except Exception :
-                sys.stderr.write ("ERROR Parsing for charset= : ")
-                sys.exit ("Exiting Program")
+        try :
+            ignore_field, ignore_type, message_type  = \
+                response_header.partition(CONTENT_TYPE)
+            # parse content type field for the type
+            message_type, ignore_SEMI_COLON, char_field = \
+                message_type.partition(SEMI_COLON)
+        except Exception :
+            sys.stderr.write ("ERROR Partitioning Content-Type: ")
+            sys.exit ("Exiting Program")
 
     # or else it's an invalid header
     else :
         sys.stderr.write ("ERROR Parsing Header : ")
         sys.exit ("Exiting Program")
 
+    # parse content type for character set
+    y = message_type.find(CHARSET_FIELD)
+    # parse the remainder for the charset field if present
+    if y != -1 :
+        try :
+            ignore_field, char_field, charset = \
+                char_field.partition(CHARSET_FIELD)
+            # parse the charset field for the value
+            charset, ignore, ignore_field = \
+                charset.partition(NEW_LINE)
+        except Exception :
+            sys.stderr.write ("ERROR Parsing for charset= : ")
+            sys.exit ("Exiting Program")
+
+    # the charset= field was not declared in the header - use the default
+    else :
+        charset = "UTF-8"
+
 
     # determine content type and print the message body
-    y = message_type.find(TEXT)
-    z = message_type.find(IMAGE)
-    if y != -1 :
-        # print text/html message body
+    x = message_type.find(TEXT)
+    y = message_type.find(IMAGE)
+
+    # print text/html message body
+    if x != -1 :
         try :
             response_body = binary_body.decode(charset)
             sys.stdout.write (response_body)
@@ -305,14 +331,15 @@ if sc != -1 :
             sys.stderr.write ("ERROR Writing Text Response Body : ")
             sys.exit ("Exiting Program")
 
-    elif z != -1 :
-        # print image message body
+    # print image message body
+    elif y != -1 :
         try :
             sys.stdout.buffer.write (binary_body)
         except Exception :
             sys.stderr.write ("ERROR Writing Image Response Body : ")
             sys.exit ("Exiting Program")
 
+    # or else it is not a valid content-type
     else :
         sys.stderr.write ("ERROR Invalid Content-Type : ")
         sys.exit ("Exiting Program")
