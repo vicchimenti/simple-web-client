@@ -44,6 +44,7 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
 END_RESPONSE = "\r\n\t\r\n\t"
+
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
@@ -169,6 +170,7 @@ except OSError :
 sock.settimeout(5)
 try :
     sock.connect ((host, port))
+    sock.setblocking(0)
 except OSError :
     print ("ERROR Connecting")
     sys.exit ("Exiting Program")
@@ -228,17 +230,19 @@ except UnicodeError :
 
 
 # receive message back from server in byte stream
-binary_header = bytearray()
-bytes_received = 0
+binary_message = bytearray()
+#bytes_received = 0
+#bytes_expected = 20
 # receive header first
 try :
     while True :
-        header_response = sock.recv (4096)
-        binary_header += header_response
-        bytes_received += len(header_response)
-        x = binary_header.find(header_delim_in_bytes)
-        if x != -1 : break
-        #if not response : break
+        response = sock.recv (4096)
+        binary_message += response
+        #bytes_received += len(header_response)
+        #if bytes_received == bytes_expected : break
+        #x = binary_header.find(header_delim_in_bytes)
+        #if x != -1 : break
+        if not response : break
 except OSError :
     print ("ERROR Receiving Response: ")
     sys.exit ("Exiting Program")
@@ -246,6 +250,10 @@ except OSError :
 
 
 
+# split the data into header and body
+binary_body = bytearray()
+binary_header = bytearray()
+binary_header, binary_body = binary_message.split(header_delim_in_bytes, 2)
 # decode the header
 try :
     response_header = binary_header.decode (charset)
@@ -338,9 +346,13 @@ x = message_type.find(TEXT)
 y = message_type.find(IMAGE)
 if x != -1 :
     # print text/html message body
+    x_str = str(x)
+    print ("in if x : " + x_str)
     try :
         response_body = binary_body.decode(charset)
         sys.stdout.write (response_body)
+        print ("response_body : " + response_body)
+        print ("in if x2 : " + x_str)
     except Exception :
         print ("ERROR Writing Text Response Body")
         sys.exit ("Exiting Program")

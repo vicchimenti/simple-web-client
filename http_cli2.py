@@ -326,3 +326,36 @@ else :
 # Close the program
 sys.exit()
 # eof
+
+
+
+
+# declare variables for to parse header content
+CONTENT_LENGTH = "Content-Length:"      # delimiter to find buffer length
+
+# scan header for Content-Length
+x = response_header.find(CONTENT_LENGTH)
+# acquire receive size
+if x != -1 :
+    ignore, length_field = response_header.split(CONTENT_LENGTH, 2)
+    length_value, ignore_new_line, ignore = length_field.partition(NEW_LINE)
+    buffer_length = int(length_value)
+else :
+    print ("ERROR Incomplete HTTP Response Header")
+    sys.exit("Exiting Program")
+
+
+
+
+# receive the body
+binary_body = bytearray()
+try :
+    while True :
+        body_response = sock.recv (4096)
+        binary_body += body_response
+        bytes_received += len(body_response)
+        if bytes_received >= buffer_length : break
+        #if not response : break
+except OSError :
+    print ("ERROR Receiving Response: ")
+    sys.exit ("Exiting Program")
