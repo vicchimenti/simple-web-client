@@ -282,6 +282,8 @@ if sc != -1 :
 
     # parse header for content type
     x = response_header.find(CONTENT_TYPE)
+    # parse content type for character set
+    y = response_header.find(CHARSET_FIELD)
     # parse response header for content type field
     if x != -1 :
         try :
@@ -299,8 +301,7 @@ if sc != -1 :
         sys.stderr.write ("ERROR Parsing Header : ")
         sys.exit ("Exiting Program")
 
-    # parse content type for character set
-    y = message_type.find(CHARSET_FIELD)
+
     # parse the remainder for the charset field if present
     if y != -1 :
         try :
