@@ -3,7 +3,7 @@
 # http_cli.py
 # v2.0
 # Created           10/19/2018
-# Last Modified     11/10/2018
+# Last Modified     11/11/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
 
@@ -45,7 +45,7 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 NEW_LINE = "\r\n"                       # delimiter for new line return
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
-END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
+#END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
