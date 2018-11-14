@@ -3,20 +3,21 @@
 # http_cli.py
 # v2.0
 # Created           10/19/2018
-# Last Modified     11/9/2018
+# Last Modified     11/11/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
 
 
 
 
-# v2 includes updates for web server assignment
-# primary changes include better error handling
-# fixed command line parameters feedback
-# fixed URL handling feedback
-# fixed HTTP Request feedback
-# fixed Content-Type parsing algorithm
-# fixed charset= parsing algorithm
+# v2 includes updates for web server assignment including:
+    # fixed Command Line parameters feedback -2 points
+    # fixed URL Handling feedback -2 points
+    # fixed HTTP Request feedback -2 points
+    # fixed Error Handling feedback -4 points
+    # fixed Discretionary feedback -3 points
+# Still Pending Fix for future sprint:
+    # Sends & Receives HTTP Messages Feedback -5 points
 
 
 
@@ -44,7 +45,7 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 NEW_LINE = "\r\n"                       # delimiter for new line return
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
-END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
+#END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
