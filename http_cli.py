@@ -334,6 +334,7 @@ if sc != -1 :
         if nl != -1 :
             try :
                 buf_str = size_field[:x]
+                print ("buf_str : " + buf_str)
             except Exception :
                 sys.stderr.write ("ERROR Assigning Length to String : ")
                 sys.exit ("Exiting Program")
@@ -345,6 +346,7 @@ if sc != -1 :
 
         # convert length to an int
         try:
+            buf_str = buf_str.strip()
             msg_length = int(buf_str)
         except Exception :
             sys.stderr.write ("ERROR Assigning the Message Length : ")
