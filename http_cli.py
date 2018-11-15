@@ -16,8 +16,7 @@
     # fixed HTTP Request feedback -2 points
     # fixed Error Handling feedback -4 points
     # fixed Discretionary feedback -3 points
-# Still Pending Fix for future sprint:
-    # Sends & Receives HTTP Messages Feedback -5 points
+    # Sends & Receives HTTP Messages feedback -5 points
 
 
 
@@ -213,14 +212,13 @@ except UnicodeError :
 binary_header = bytearray()
 binary_body = bytearray()
 
-# receive header first
+# receive only the header first
 try :
     while True :
         response = sock.recv (1)
         binary_header += response
         x = binary_header.find(delim_in_bytes)
         if x != -1 : break
-        #if not response : break
 except OSError :
     sys.stderr.write ("ERROR Receiving Header : ")
     sys.exit ("Exiting Program")
@@ -330,10 +328,10 @@ if sc != -1 :
 
 
 
-    # receive message back from server in byte stream
+    # receive message body from server in byte stream
     recv_buffer = 0
 
-    # receive body
+    # receive body one byte at a time until all of message received
     try :
         while True :
             body = sock.recv (1)
