@@ -211,6 +211,8 @@ except UnicodeError :
 
 # receive message back from server in byte stream
 binary_header = bytearray()
+binary_body = bytearray()
+
 # receive header first
 try :
     while True :
@@ -229,23 +231,6 @@ try :
 except OSError :
     sys.stderr.write ("ERROR Decoding Image Header : ")
     sys.exit ("Exiting Program")
-
-
-# ********** TODO : Evaluate this Split, it may be causing an issue ********
-# split the data into header and body
-#binary_body = bytearray()
-#try :
-#    binary_header, ignore, binary_body = \
-#        binary_message.partition(delim_in_bytes)
-#except Exception :
-#    sys.stderr.write ("ERROR With Binary Partition : ")
-#    sys.exit ("Exiting Program")
-
-# add delimiter
-#response_header += END_HEADER
-
-
-
 
 # print the Header
 try :
@@ -323,30 +308,15 @@ if sc != -1 :
             sys.stderr.write ("ERROR Parsing for Content-Length : ")
             sys.exit ("Exiting Program")
 
-        # extract the length string
-        try :
-            nl = size_field.find(NEW_LINE)
-        except Exception :
-            sys.stderr.write ("ERROR Isolating the Message Length : ")
-            sys.exit ("Exiting Program")
-
         # slice the length from the header
-        if nl != -1 :
-            try :
-                buf_str = size_field[:x]
-                print ("buf_str : " + buf_str)
-            except Exception :
-                sys.stderr.write ("ERROR Assigning Length to String : ")
-                sys.exit ("Exiting Program")
-
-        # or else a valid length was not present in the header
-        else :
-            sys.stderr.write ("ERROR Invalid Length Format : ")
+        try :
+            buf_str, ignore_nl, ignore_field = size_field.partition('\r\n')
+        except Exception :
+            sys.stderr.write ("ERROR Assigning Length to String : ")
             sys.exit ("Exiting Program")
 
         # convert length to an int
         try:
-            buf_str = buf_str.strip()
             msg_length = int(buf_str)
         except Exception :
             sys.stderr.write ("ERROR Assigning the Message Length : ")
@@ -357,6 +327,55 @@ if sc != -1 :
         sys.stderr.write ("ERROR Invalid Header : Length Not Given : ")
         sys.exit ("Exiting Program")
 
+
+
+
+    # receive message back from server in byte stream
+    recv_buffer = 0
+
+    # receive body
+    try :
+        while True :
+            body = sock.recv (1)
+            binary_body += body
+            recv_buffer += 1
+            if recv_buffer >= msg_length : break
+    except OSError :
+        sys.stderr.write ("ERROR Receiving Body : ")
+        sys.exit ("Exiting Program")
+
+    # add delimiter for formatting output
+    binary_body += delim_in_bytes
+
+
+
+
+    # determine content type and print the message body
+    x = message_type.find(TEXT)
+    y = message_type.find(IMAGE)
+
+    # decode and print text/html message body
+    if x != -1 :
+        try :
+            response_body = binary_body.decode(charset)
+            sys.stdout.write (response_body)
+        except Exception :
+            sys.stderr.write ("ERROR Writing Text Response Body : ")
+            sys.exit ("Exiting Program")
+
+    # print image message body
+    elif y != -1 :
+        try :
+            sys.stdout.buffer.write (binary_body)
+        except Exception :
+            sys.stderr.write ("ERROR Writing Image Response Body : ")
+            sys.exit ("Exiting Program")
+
+    # or else it is not a valid content-type
+    else :
+        sys.stderr.write ("ERROR Invalid Content-Type : ")
+        sys.exit ("Exiting Program")
+
 # or else the Status Code is not 200 OK
 else :
     try :
@@ -365,54 +384,6 @@ else :
     except Exception :
         sys.stderr.write ("ERROR Writing Response Body : Status Code not 200 OK : ")
         sys.exit ("Exiting Program")
-
-
-
-
-
-# receive message back from server in byte stream
-binary_body = bytearray()
-recv_buffer = 0
-# receive body
-try :
-    while True :
-        body = sock.recv (1)
-        binary_body += body
-        recv_buffer += 1
-        if recv_buffer >= msg_length : break
-
-        #x = binary_header.find(delim_in_bytes)
-        #if x != -1 : break
-        #if not response : break
-except OSError :
-    sys.stderr.write ("ERROR Receiving Body : ")
-    sys.exit ("Exiting Program")
-
-# determine content type and print the message body
-x = message_type.find(TEXT)
-y = message_type.find(IMAGE)
-
-# print text/html message body
-if x != -1 :
-    try :
-        response_body = binary_body.decode(charset)
-        sys.stdout.write (response_body)
-    except Exception :
-        sys.stderr.write ("ERROR Writing Text Response Body : ")
-        sys.exit ("Exiting Program")
-
-# print image message body
-elif y != -1 :
-    try :
-        sys.stdout.buffer.write (binary_body)
-    except Exception :
-        sys.stderr.write ("ERROR Writing Image Response Body : ")
-        sys.exit ("Exiting Program")
-
-# or else it is not a valid content-type
-else :
-    sys.stderr.write ("ERROR Invalid Content-Type : ")
-    sys.exit ("Exiting Program")
 
 
 # Close the Socket
