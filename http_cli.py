@@ -323,10 +323,29 @@ if sc != -1 :
             sys.stderr.write ("ERROR Parsing for Content-Length : ")
             sys.exit ("Exiting Program")
 
-        # extract the length and assign to int var
+        # extract the length string
         try :
-            buf_str, ignore = size_field.split(NEW_LINE, 2)
-            msg_length = int(bufstr)
+            nl = size_field.find(NEW_LINE)
+        except Exception :
+            sys.stderr.write ("ERROR Isolating the Message Length : ")
+            sys.exit ("Exiting Program")
+
+        # slice the length from the header
+        if nl != -1 :
+            try :
+                buf_str = size_field[:x]
+            except Exception :
+                sys.stderr.write ("ERROR Assigning Length to String : ")
+                sys.exit ("Exiting Program")
+
+        # or else a valid length was not present in the header
+        else :
+            sys.stderr.write ("ERROR Invalid Length Format : ")
+            sys.exit ("Exiting Program")
+
+        # convert length to an int
+        try:
+            msg_length = int(buf_str)
         except Exception :
             sys.stderr.write ("ERROR Assigning the Message Length : ")
             sys.exit ("Exiting Program")
