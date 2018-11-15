@@ -3,7 +3,7 @@
 # http_cli.py
 # v2.0
 # Created           10/19/2018
-# Last Modified     11/11/2018
+# Last Modified     11/15/2018
 # Simple Web Client in Python3
 # /usr/local/python3/bin/python3
 
@@ -16,8 +16,7 @@
     # fixed HTTP Request feedback -2 points
     # fixed Error Handling feedback -4 points
     # fixed Discretionary feedback -3 points
-# Still Pending Fix for future sprint:
-    # Sends & Receives HTTP Messages Feedback -5 points
+    # Sends & Receives HTTP Messages feedback -5 points
 
 
 
@@ -45,7 +44,6 @@ COLON = ":"                             # delimiter for parsing port from URL
 SEMI_COLON = ";"                        # delimiter for parsing data from header
 NEW_LINE = "\r\n"                       # delimiter for new line return
 END_HEADER = "\r\n\r\n"                 # delimiter for parsing header and body
-#END_RESPONSE = "\r\n\t\r\n\t"           # custom delimiter for checking http_svr
 MATCH_ALL = "0.0.0.0"                   # for IP validity checking
 
 
@@ -188,6 +186,7 @@ except Exception :
 # send message to the web server
 try :
     sock.sendall (message.encode (charset))
+    # tell server I am sending only 1 message
     sock.shutdown(1)
 except UnicodeError :
     sys.stderr.write ("Error Encoding Message : ")
@@ -210,33 +209,19 @@ except UnicodeError :
 
 
 # receive message back from server in byte stream
-binary_message = bytearray()
-# receive header first
+binary_header = bytearray()
+binary_body = bytearray()
+
+# receive only the header first one byte at a time
 try :
     while True :
-        response = sock.recv (65536)
-        binary_message += response
-        if not response : break
+        response = sock.recv (1)
+        binary_header += response
+        x = binary_header.find(delim_in_bytes)
+        if x != -1 : break
 except OSError :
-    sys.stderr.write ("ERROR Receiving Response : ")
+    sys.stderr.write ("ERROR Receiving Header : ")
     sys.exit ("Exiting Program")
-
-
-
-
-# ********** TODO : Evaluate this Split, it may be causing an issue ********
-# split the data into header and body
-binary_body = bytearray()
-binary_header = bytearray()
-try :
-    binary_header, ignore, binary_body = \
-        binary_message.partition(delim_in_bytes)
-except Exception :
-    sys.stderr.write ("ERROR With Binary Partition : ")
-    sys.exit ("Exiting Program")
-
-
-
 
 # decode the header
 try :
@@ -244,11 +229,6 @@ try :
 except OSError :
     sys.stderr.write ("ERROR Decoding Image Header : ")
     sys.exit ("Exiting Program")
-# add delimiter
-response_header += END_HEADER
-
-
-
 
 # print the Header
 try :
@@ -260,13 +240,15 @@ except Exception :
 
 
 
-# declare variables for to parse header content
-CONTENT_TYPE = "Content-Type:"
+# initialize variables for to parse header content
+LENGTH_FIELD = "Content-Length:"
+TYPE_FIELD = "Content-Type:"
 CHARSET_FIELD = "charset="
 TEXT = "text"
 IMAGE = "image"
 message_type = ""
 char_field = ""
+msg_length = 0
 
 
 
@@ -279,14 +261,16 @@ sc = response_header.find(STATUS_CODE)
 if sc != -1 :
 
     # parse header for content type
-    x = response_header.find(CONTENT_TYPE)
+    x = response_header.find(TYPE_FIELD)
     # parse content type for character set
     y = response_header.find(CHARSET_FIELD)
+    # parse header for content size
+    z = response_header.find(LENGTH_FIELD)
     # parse response header for content type field
     if x != -1 :
         try :
             ignore_field, ignore_type, message_type  = \
-                response_header.partition(CONTENT_TYPE)
+                response_header.partition(TYPE_FIELD)
             # parse content type field for the type
             message_type, ignore_SEMI_COLON, char_field = \
                 message_type.partition(SEMI_COLON)
@@ -310,6 +294,56 @@ if sc != -1 :
         except Exception :
             sys.stderr.write ("ERROR Parsing for charset= : ")
             sys.exit ("Exiting Program")
+    # else use the default charset assignment
+
+    # parse response_header for the message length
+    if z != -1 :
+        # find the field containing the length
+        try :
+            ignore_field, target_field, size_field = \
+                response_header.partition(LENGTH_FIELD)
+        except Exception :
+            sys.stderr.write ("ERROR Parsing for Content-Length : ")
+            sys.exit ("Exiting Program")
+
+        # slice the length from the header
+        try :
+            buf_str, ignore_nl, ignore_field = size_field.partition('\r\n')
+        except Exception :
+            sys.stderr.write ("ERROR Assigning Length to String : ")
+            sys.exit ("Exiting Program")
+
+        # convert length to an int
+        try:
+            msg_length = int(buf_str)
+        except Exception :
+            sys.stderr.write ("ERROR Assigning the Message Length : ")
+            sys.exit ("Exiting Program")
+
+    # or else there is no length in the header
+    else :
+        sys.stderr.write ("ERROR Invalid Header : Length Not Given : ")
+        sys.exit ("Exiting Program")
+
+
+
+
+    # receive message body from server in byte stream
+    recv_buffer = 0
+
+    # receive body one byte at a time until all of message received
+    try :
+        while True :
+            body = sock.recv (1)
+            binary_body += body
+            recv_buffer += 1
+            if recv_buffer >= msg_length : break
+    except OSError :
+        sys.stderr.write ("ERROR Receiving Body : ")
+        sys.exit ("Exiting Program")
+
+    # add delimiter for formatting output
+    binary_body += delim_in_bytes
 
 
 
@@ -318,7 +352,7 @@ if sc != -1 :
     x = message_type.find(TEXT)
     y = message_type.find(IMAGE)
 
-    # print text/html message body
+    # decode and print text/html message body
     if x != -1 :
         try :
             response_body = binary_body.decode(charset)
@@ -341,6 +375,8 @@ if sc != -1 :
         sys.exit ("Exiting Program")
 
 
+
+
 # or else the Status Code is not 200 OK
 else :
     try :
@@ -349,6 +385,7 @@ else :
     except Exception :
         sys.stderr.write ("ERROR Writing Response Body : Status Code not 200 OK : ")
         sys.exit ("Exiting Program")
+
 
 
 
