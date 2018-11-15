@@ -212,7 +212,7 @@ except UnicodeError :
 binary_header = bytearray()
 binary_body = bytearray()
 
-# receive only the header first
+# receive only the header first one byte at a time
 try :
     while True :
         response = sock.recv (1)
