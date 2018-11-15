@@ -242,7 +242,7 @@ except Exception :
 
 
 
-# declare variables for to parse header content
+# initialize variables for to parse header content
 LENGTH_FIELD = "Content-Length:"
 TYPE_FIELD = "Content-Type:"
 CHARSET_FIELD = "charset="
@@ -376,6 +376,9 @@ if sc != -1 :
         sys.stderr.write ("ERROR Invalid Content-Type : ")
         sys.exit ("Exiting Program")
 
+
+
+
 # or else the Status Code is not 200 OK
 else :
     try :
@@ -384,6 +387,8 @@ else :
     except Exception :
         sys.stderr.write ("ERROR Writing Response Body : Status Code not 200 OK : ")
         sys.exit ("Exiting Program")
+
+
 
 
 # Close the Socket
