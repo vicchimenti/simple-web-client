@@ -147,22 +147,20 @@ if host_ip_str == MATCH_ALL :
         sys.exit ("Exiting Program")
 
 
-
-
 # Set up a TCP/IP socket
-try :
-    sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
-except OSError :
-    sys.stderr.write ("ERROR Creating Socket : ")
-    sys.exit ("Exiting Program")
+try:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+except OSError:
+    sys.stderr.write("ERROR Creating Socket : ")
+    sys.exit("Exiting Program")
 
 # Connect to the server as a client
 sock.settimeout(10)
-try :
-    sock.connect ((host, port))
-except OSError :
-    sys.stderr.write ("ERROR Connecting : ")
-    sys.exit ("Exiting Program")
+try:
+    sock.connect((host, port))
+except OSError:
+    sys.stderr.write("ERROR Connecting : ")
+    sys.exit("Exiting Program")
 
 
 
