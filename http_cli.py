@@ -1,11 +1,13 @@
-# Vic Chimenti
-# CPSC 5510 FQ18
-# http_cli.py
-# v2.0
-# Created           10/19/2018
-# Last Modified     11/15/2018
-# Simple Web Client in Python3
-# /usr/local/python3/bin/python3
+"""
+    # Vic Chimenti
+    # CPSC 5510 FQ18
+    # http_cli.py
+    # v2.0
+    # Created           10/19/2018
+    # Last Modified     11/15/2018
+    # Simple Web Client in Python3
+    # /usr/local/python3/bin/python3
+"""
 
 
 """
